@@ -1,0 +1,26 @@
+{
+  "name": "grunt-asset-bender",
+  "description": "A series of grunt tasks to help integrate asset bender pre-compilation, versioning, etc into a grunt workflow.",
+  "version": "0.1.0",
+  "homepage": "https://github.com/HubSpot/grunt-asset-bender",
+  "author": {
+    "name": "Tim Finley"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/HubSpot/grunt-asset-bender.git"
+  },
+  "bugs": {
+    "url": "https://github.com/HubSpot/grunt-asset-bender/issues"
+  },
+  "dependencies": {
+    "temp": "~0.5.0"
+  },
+  "peerDependencies": {
+    "grunt": "~0.4.0"
+  },
+  "keywords": [
+    "gruntplugin",
+    "asset bender"
+  ]
+}
