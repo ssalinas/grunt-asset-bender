@@ -15,16 +15,12 @@ module.exports = function(grunt) {
       archiveDir: null,
       targetDir: null,
       compressed: true,
-      processes: null,
-      benderPath: "",
-      benderScript: "bender"
+      processes: null
     });
 
     var cmd = [
-      options.benderPath + options.benderScript,
-      // options.benderScript,
-
-      "--mode", options.compressed ? "compressed" : "development",
+      benderUtils.script(options),
+      "--mode", benderUtils.mode(options),
 
       "precompile",
 
