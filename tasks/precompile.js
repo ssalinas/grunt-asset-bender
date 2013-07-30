@@ -2,25 +2,28 @@
 module.exports = function(grunt) {
   'use strict';
 
-  var path = require('path');
-  var temp = require('temp');
   var benderUtils = require('../lib/bender-utils');
-
   var _ = grunt.util._;
 
-  grunt.registerMultiTask('bender-precompile', 'Uses asset bender to pre-compile & concatenate static files (SASS, Coffeescript, JS templates, etc)', function() {
+  grunt.registerTask('bender-precompile', 'Uses asset bender to pre-compile & concatenate static files (SASS, Coffeescript, JS templates, etc)', function() {
 
     var options = this.options({
       sourceProject: null,
       archiveDir: null,
       targetDir: null,
-      compressed: true,
+      compressed: null,
       processes: null
     });
 
+    // Run time grunt overrides
+    options.compressed = this.flags.compressed || options.compressed;
+    options.archiveDir = grunt.option('archiveDir') || options.archiveDir;
+    options.targetDir = grunt.option('targetDir') || options.targetDir;
+    options.processes = grunt.option('processes') || options.processes;
+
     var cmd = [
-      benderUtils.script(options),
-      "--mode", benderUtils.mode(options),
+      benderUtils.script(options, grunt),
+      "--mode", benderUtils.mode(options, grunt),
 
       "precompile",
 
@@ -32,20 +35,7 @@ module.exports = function(grunt) {
       cmd.push("--processes", options.processes);
     }
 
-    var extraRuntimeConfig = {};
-
-    if (options.archiveDir !== null) {
-      extraRuntimeConfig['archive_dir'] = path.resolve(options.archive_dir);
-    }
-
-    if (extraRuntimeConfig.length > 0) {
-      var tempFile = temp.openSync({ suffix: '.json' });
-      tempFile.fd.writeSync(JSON.stringify(extraRuntimeConfig));
-      tempFile.fd.closeSync();
-
-      cmd.push("--runtime-config-file", tempFile.path);
-    }
-
+    benderUtils.prepareExtraBenderRuntimeConfig(cmd, options);
     benderUtils.runBenderCommand(cmd, grunt);
 
   });
