@@ -12,7 +12,7 @@ module.exports = (grunt) ->
 
         for fileInfo in @files
             srcFilePath = fileInfo.src[0]
-            srcFile = fs.readFileSync(srcFilePath, 'utf8')
+            srcFile = grunt.read.file srcFilePath
 
             getModulePathParts = (name) ->
                 name = name.replace /\/\//g, '/'

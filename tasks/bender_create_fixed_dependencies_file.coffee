@@ -14,7 +14,7 @@ module.exports = (grunt) ->
         output = JSON.stringify(output, null, 4)
 
         grunt.verbose.writeln "Writing #{outputPath}:\n#{output}\n"
-        fs.writeFileSync outputPath, output
+        grunt.file.writeoutputPath, output
 
     writeFixedDepsFile = (outputPath) ->
         output =
@@ -25,7 +25,7 @@ module.exports = (grunt) ->
         output = JSON.stringify(output, null, 4)
 
         grunt.verbose.writeln "Writing #{outputPath}:\n#{output}\n"
-        fs.writeFileSync outputPath, output
+        grunt.file.write outputPath, output
 
 
     grunt.registerTask 'bender_create_fixed_dependencies_file', '', ->

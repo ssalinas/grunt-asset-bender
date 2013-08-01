@@ -12,7 +12,7 @@ module.exports = (grunt) ->
 
         try
             hashPath = path.join outputDir, projectName, "static-#{version}", "premunged-static-contents-hash.md5"
-            fs.readFileSync path, 'utf8'
+            grunt.read.file path
         catch err
             try
                 hashPath = path.join outputDir, projectName, "static", "premunged-static-contents-hash.md5"

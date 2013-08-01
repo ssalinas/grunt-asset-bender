@@ -71,7 +71,7 @@ exports.init = (grunt) ->
 
     loadBenderProjectConfig = (projectDir) ->
         configPath = path.join projectDir, 'static', 'static_conf.json'
-        contents = fs.readFileSync configPath, "utf8"
+        contents = grunt.read.file configPath
         config = JSON.parse contents
 
         # Support legacy key names that used underscores instead of camel case
@@ -128,9 +128,9 @@ exports.init = (grunt) ->
         value = value.toLowerCase()
         value in ['1', 'true', 'on', 'yes']
 
-    copyFileSync = (srcFile, destFile, encoding) ->
-        content = fs.readFileSync(srcFile, encoding)
-        fs.writeFileSync(destFile, content, encoding)
+    copyFileSync = (srcFile, destFile) ->
+        content = grunt.file.read srcFile
+        grunt.file.write destFile, content
 
     moveSync = (source, dest) ->
         grunt.fail.warn "Can't move, #{source} doesn't exist" unless fs.existsSync source

@@ -46,7 +46,7 @@ module.exports = (grunt) ->
 
             grunt.config.set 'bender.build.archiveDir', options.archiveDir
 
-            dependencyTree = JSON.parse fs.readFileSync(dependencyTreeOutputPath, 'utf-8')
+            dependencyTree = JSON.parse grunt.read.file(dependencyTreeOutputPath)
             grunt.config.set 'bender.build.fixedProjectDeps', dependencyTree[projectName]
 
             grunt.log.writeln "Done with downloading deps."
