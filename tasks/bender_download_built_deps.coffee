@@ -7,7 +7,7 @@ module.exports = (grunt) ->
     utils = require('../lib/utils').init(grunt)
     LegacyAssetBenderRunner = require('../lib/legacy_asset_bender_runner').init(grunt)
 
-    grunt.registerTask 'bender_update_deps', 'Download and create list of dependencies via HubSpot static v3', ->
+    grunt.registerTask 'bender_download_built_deps', 'Download the built output of dependencies via HubSpot static v3', ->
         done = @async()
 
         grunt.config.requires 'bender.build.tempDir',
@@ -21,6 +21,7 @@ module.exports = (grunt) ->
         options = @options
             project: projectDir or process.cwd()
             archiveDir: path.join tempDir, 'static-archive'
+            builtArchiveDir: path.join tempDir, 'built-archive'
 
         useLocalMirrorSetting = utils.envVarEnabled('USE_LOCAL_ARCHIVE_MIRROR', true)
 
@@ -31,25 +32,19 @@ module.exports = (grunt) ->
         if options.mirrorArchiveDir
             grunt.config.set 'bender.build.mirrorArchiveDir', options.mirrorArchiveDir
 
-        dependencyTreeOutputPath = path.join tempDir, 'dependency-tree.json'
-
         runner = new LegacyAssetBenderRunner _.extend options,
-            command: 'update-deps'
-            archiveDir: options.archiveDir
+            command: 'download-built-deps'
+            # archiveDir: options.archiveDir
+            destDir: options.builtArchiveDir
             mirrorArchiveDir: options.mirrorArchiveDir
-            fixedDepsPath: dependencyTreeOutputPath
 
-        stopwatch.start 'download_static_deps'
+        stopwatch.start 'download_prebuilt_static_deps'
 
         runner.run().done ->
-            stopwatch.stop 'download_static_deps'
+            stopwatch.stop 'download_prebuilt_static_deps'
 
-            grunt.config.set 'bender.build.archiveDir', options.archiveDir
+            grunt.config.set 'bender.build.builtArchiveDir', options.builtArchiveDir
 
-            dependencyTree = JSON.parse grunt.file.read(dependencyTreeOutputPath)
-            grunt.config.set 'bender.build.fixedProjectDeps', dependencyTree[projectName]
-
-            grunt.log.writeln "Done with downloading deps."
             done()
         , (message) ->
             done new Error(message || "unkown error")

@@ -14,7 +14,7 @@ module.exports = (grunt) ->
         output = JSON.stringify(output, null, 4)
 
         grunt.verbose.writeln "Writing #{outputPath}:\n#{output}\n"
-        grunt.file.writeoutputPath, output
+        grunt.file.write outputPath, output
 
     writeFixedDepsFile = (outputPath) ->
         output =

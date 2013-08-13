@@ -71,7 +71,7 @@ exports.init = (grunt) ->
 
     loadBenderProjectConfig = (projectDir) ->
         configPath = path.join projectDir, 'static', 'static_conf.json'
-        contents = grunt.read.file configPath
+        contents = grunt.file.read configPath
         config = JSON.parse contents
 
         # Support legacy key names that used underscores instead of camel case
@@ -151,4 +151,5 @@ exports.init = (grunt) ->
         graphiteStopwatch
         envVarEnabled
         moveSync
+        copyFileSync
     }

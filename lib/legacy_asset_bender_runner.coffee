@@ -21,6 +21,7 @@ exports.init = (grunt) ->
             @bufferOutput = options.bufferOutput ? false
 
             # hs-static options
+            @args = options.args || []
             @mode = options.mode or "development"
 
             @projects = options.project
@@ -102,7 +103,8 @@ exports.init = (grunt) ->
                 bits.push @[optionFunc]()
 
             # Flatten everything and omit empties
-            _.flatten _.filter(bits, (x) -> x?)
+            @args.concat(_.flatten(_.filter(bits, (x) -> x?)))
+
 
         buildFullCommandString: ->
             [@executable, @command].concat(@buildOptionsArray()).join ' '

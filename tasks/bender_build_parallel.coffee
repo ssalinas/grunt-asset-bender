@@ -12,7 +12,7 @@ module.exports = (grunt) ->
 
         try
             hashPath = path.join outputDir, projectName, "static-#{version}", "premunged-static-contents-hash.md5"
-            grunt.read.file path
+            grunt.file.read path
         catch err
             try
                 hashPath = path.join outputDir, projectName, "static", "premunged-static-contents-hash.md5"
@@ -42,6 +42,7 @@ module.exports = (grunt) ->
         else
             grunt.verbose.writeln "Not interpolating any dependency versions during compilation"
 
+
         modesBuilt = []
         promises = []
 
@@ -67,6 +68,7 @@ module.exports = (grunt) ->
 
                 grunt.log.writeln "\nDebug output\n============"
                 grunt.log.writeln result.stdoutAndStderr
+                grunt.log.writeln "== End debug output"
 
                 modesBuilt.push debugOptions.mode
                 grunt.config.set "bender.build.#{debugOptions.mode}.outputDir", debugOptions.destDir
@@ -94,6 +96,7 @@ module.exports = (grunt) ->
 
                 grunt.log.writeln "\nCompressed output\n================="
                 grunt.log.writeln result.stdoutAndStderr
+                grunt.log.writeln "== End compressed output"
 
                 modesBuilt.push compressedOptions.mode
                 grunt.config.set "bender.build.#{compressedOptions.mode}.outputDir", compressedOptions.destDir

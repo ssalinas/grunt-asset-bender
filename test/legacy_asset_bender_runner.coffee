@@ -148,7 +148,7 @@ exports.legacy_asset_bender_options =
             domain: 'somevalue'
 
         test.expect 1
-        test.deepEqual runner.domainOption(), ["--domain", "somevalue"]
+        test.deepEqual runner.domainOption(), ["--domain", "'somevalue'"]
         test.done()
 
     fixedDepsPath: (test) ->
@@ -197,11 +197,11 @@ exports.legacy_asset_bender_options =
         test.deepEqual runner.buildOptionsArray(), [
             "-p", "/tmp/something/out/there", "-p", "/Users/rand-al-thor/the/DRAGON"
             "-b", "proj1:static-1.1", "-b", "proj2:static-3.256", "-b", "another_proj:static-11.17"
+            "--domain", "'static2cdn.hubspot.com'"
             "--mode", "compressed"
             "--target", "/opt/cool/stuff/here"
             "--restrict", "there"
             "--temp", "/tmp/TEMP/no_really"
-            "--domain", "static2cdn.hubspot.com"
         ]
         test.done()
 
@@ -216,10 +216,36 @@ exports.legacy_asset_bender_options =
         test.expect 1
         test.deepEqual runner.buildOptionsArray(), [
             "-p", "/Users/rand-al-thor/the/DRAGON"
+            "--domain", "'static2cdn.hubspot.com'"
             "--mode", "development"
             "--target", "/opt/cool/stuff/here"
             "--restrict", "there"
-            "--domain", "static2cdn.hubspot.com"
+        ]
+        test.done()
+
+    withAnArg: (test) ->
+        runner = new LegacyAssetBenderRunner
+            command: 'paths'
+            args: ['someproj']
+
+        test.expect 1
+        test.deepEqual runner.buildOptionsArray(), [
+            "someproj"
+            "--mode", "development"
+        ]
+        test.done()
+
+    withAnArg2: (test) ->
+        runner = new LegacyAssetBenderRunner
+            command: 'paths'
+            args: ['someproj']
+            project: "/Users/rand-al-thor/the/DRAGON"
+
+        test.expect 1
+        test.deepEqual runner.buildOptionsArray(), [
+            "someproj"
+            "-p", "/Users/rand-al-thor/the/DRAGON"
+            "--mode", "development"
         ]
         test.done()
 
