@@ -11,7 +11,8 @@ module.exports = (grunt) ->
         done = @async()
 
         grunt.config.requires 'bender.build.tempDir',
-                              'bender.build.projectName'
+                              'bender.build.projectName',
+                              'bender.assetBenderDir'
 
         tempDir     = grunt.config.get 'bender.build.tempDir'
         projectName = grunt.config.get 'bender.build.projectName'
@@ -21,6 +22,7 @@ module.exports = (grunt) ->
         options = @options
             project: projectDir or process.cwd()
             archiveDir: path.join tempDir, 'static-archive'
+            assetBenderPath: grunt.config.get 'bender.assetBenderDir'
 
         useLocalMirrorSetting = utils.envVarEnabled('USE_LOCAL_ARCHIVE_MIRROR', true)
 
