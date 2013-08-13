@@ -5,7 +5,8 @@ graphite = require 'graphite'
 _ = require 'underscore'
 { spawn } = require 'child_process'
 
-{ DualGraphiteStopWatch, FauxGraphiteStopWatch } = require '../lib/graphiteStopwatch.coffee'
+{ DualGraphiteStopwatch, FauxGraphiteStopwatch } = require '../lib/graphiteStopwatch.coffee'
+
 
 innerExports = undefined
 
@@ -112,16 +113,17 @@ exports.init = (grunt) ->
         stopwatch = _global_stopwatch ? createGraphiteStopwatch(grunt)
 
     createGraphiteStopwatch = ->
-        server = grunt.config.get 'bender.graphite.server'
-        port = grunt.config.get 'bender.graphite.port'
+        server =    grunt.config.get 'bender.graphite.server'
+        port =      grunt.config.get 'bender.graphite.port'
         namespace = grunt.config.get('bender.graphite.namespace') ? 'jenkins'
+        jobName =   grunt.config.get 'bender.build.jobName'
 
         if server and port
             graphiteClient = graphite.createClient("plaintext://#{server}:#{port}")
-            _global_stopwatch = new DualGraphiteStopWatch("#{namespace}.bender.", "#{graphite.config.get 'bender.build.jobName'}.", graphiteClient)
+            _global_stopwatch = new DualGraphiteStopwatch("#{namespace}.bender.", "#{jobName}.", graphiteClient)
         else
             grunt.log.writeln "Not logging to graphite, GRAPHITE_SERVER and GRAPHITE_PORT must be set."
-            _global_stopwatch = new FauxGraphiteStopWatch()
+            _global_stopwatch = new FauxGraphiteStopwatch()
 
     envVarEnabled = (envVarName, defaultValue = true) ->
         value = process.env[envVarName] ? new String(defaultValue)

@@ -58,7 +58,7 @@ class DualGraphiteStopwatch extends GraphiteStopwatch
     @_stop @secondaryPrefix + name
 
 
-class FauxGraphiteStopWatch extends GraphiteStopwatch
+class FauxGraphiteStopwatch extends GraphiteStopwatch
   constructor: ->
     super('', null)
 
@@ -67,4 +67,4 @@ class FauxGraphiteStopWatch extends GraphiteStopwatch
       console.log "#{name} took: #{duration}s"
 
 
-module.exports = { GraphiteStopwatch, DualGraphiteStopwatch, FauxGraphiteStopWatch }
+module.exports = { GraphiteStopwatch, DualGraphiteStopwatch, FauxGraphiteStopwatch }
