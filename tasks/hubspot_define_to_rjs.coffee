@@ -12,7 +12,7 @@ module.exports = (grunt) ->
 
         for fileInfo in @files
             srcFilePath = fileInfo.src[0]
-            srcFile = grunt.read.file srcFilePath
+            srcFile = grunt.file.read srcFilePath
 
             getModulePathParts = (name) ->
                 name = name.replace /\/\//g, '/'
@@ -32,15 +32,15 @@ module.exports = (grunt) ->
             processModulePath = (name) ->
                 parts = getModulePathParts name
                 return "'" + parts.join("/") + "'"
-            
+
             grunt.log.writeln "\nProcessing #{srcFilePath}..."
             isHubSpotDefine = (node) ->
-                node.type is "CallExpression" and node.callee?.object?.name is "hubspot" and node.callee.property.name is "define"                
+                node.type is "CallExpression" and node.callee?.object?.name is "hubspot" and node.callee.property.name is "define"
 
             output = falafel srcFile, (node) ->
                 # rewrite dependencies
 
-                if node.type is "Literal" and isHubSpotDefine(node.parent) and node.parent.arguments[0].value is node.value    
+                if node.type is "Literal" and isHubSpotDefine(node.parent) and node.parent.arguments[0].value is node.value
                     grunt.verbose.writeln "Found module #{node.value} at #{srcFilePath}"
 
                     if options.verifyPath and node.value isnt null and /^(hubspot|hs)/.test(node.value) # if we're verifying this path

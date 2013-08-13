@@ -2,6 +2,7 @@ fs = require 'fs'
 path = require 'path'
 Q = require 'q'
 graphite = require 'graphite'
+_ = require 'underscore'
 { spawn } = require 'child_process'
 
 { DualGraphiteStopWatch, FauxGraphiteStopWatch } = require '../lib/graphiteStopwatch.coffee'
@@ -10,7 +11,6 @@ innerExports = undefined
 
 exports.init = (grunt) ->
     return innerExports if innerExports?
-
     innerExports = {}
 
     expandHomeDirectory = (filepath) ->
@@ -138,6 +138,34 @@ exports.init = (grunt) ->
         grunt.fail.warn "Move failed #{dest} doesn't exist" unless fs.existsSync dest
         grunt.verbose.writeln "Moved: ", source, "to", dest
 
+    benderInfoForProject = (projectName) ->
+        return grunt.config.get('bender.build.projectInfo') if grunt.config.get 'bender.build.projectInfo'
+
+        grunt.config.requires 'bender.build.fixedProjectDeps',
+                              'bender.build.copiedProjectDir',
+                              'bender.build.archiveDir',
+                              'bender.build.version'
+
+        LegacyAssetBenderRunner = require('./legacy_asset_bender_runner').init(grunt)
+
+        buildVersions = _.extend {}, grunt.config.get('bender.build.fixedProjectDeps')
+        buildVersions[projectName] = grunt.config.get 'bender.build.version'
+
+        runner = new LegacyAssetBenderRunner
+            command: 'project_info'
+            args: [projectName]
+            bufferOutput: true
+            buildVersions: buildVersions
+            project: grunt.config.get('bender.build.copiedProjectDir')
+            archiveDir: grunt.config.get('bender.build.archiveDir')
+
+        runner.run().then (result) ->
+            projectInfo = JSON.parse result.stdout
+            grunt.verbose.writeln result.stdoutAndStderr
+            projectInfo
+        .fail (result) ->
+            grunt.log.writeln result.stdoutAndStderr
+            grunt.fail.warn "Error getting project_info for #{projectName}"
 
     innerExports = {
         expandHomeDirectory
@@ -152,4 +180,5 @@ exports.init = (grunt) ->
         envVarEnabled
         moveSync
         copyFileSync
+        benderInfoForProject
     }
