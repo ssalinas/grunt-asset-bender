@@ -4,6 +4,7 @@ path = require 'path'
 mkdirp = require 'mkdirp'
 rimraf = require 'rimraf'
 wrench = require 'wrench'
+fs = require 'fs'
 
 module.exports = (grunt) ->
     utils = require('../lib/utils').init(grunt)
@@ -45,6 +46,11 @@ module.exports = (grunt) ->
         persistedCacheDir = "#{grunt.config.get 'bender.build.workspace'}/hs-static-tmp-persisted"
         shouldPersistCache = utils.envVarEnabled('PERSIST_HS_STATIC_CACHE', true)
 
+        # Get rid of this if the "depend asset on dep versions" features ever gets implemented
+        if shouldPersistCache
+            shouldPersistCache = false
+            grunt.log.error "Requirejs builds currently don't support persisting the cache. Forcing a new cache."
+
         if shouldPersistCache
             # If configured, keep the static cache between builds
             sprocketsCacheDir = persistedCacheDir
@@ -56,7 +62,7 @@ module.exports = (grunt) ->
 
             if fs.existsSync persistedCacheDir
                 grunt.log.writeln "Blowing away the persisted cache since this build isn't using it (rm -rf #{persistedCacheDir})"
-                rimraf persistedCacheDir
+                rimraf persistedCacheDir, ->
 
         setRequiredBuildConfig 'bender.build.sprocketsCacheDir', sprocketsCacheDir
 
