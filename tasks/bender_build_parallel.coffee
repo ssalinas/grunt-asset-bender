@@ -8,7 +8,7 @@ module.exports = (grunt) ->
     LegacyAssetBenderRunner = require('../lib/legacy_asset_bender_runner').init(grunt)
 
     getBuildHash = (projectName, version, outputDir) ->
-            hashPath = path.join outputDir, projectName, "static", "premunged-static-contents-hash.md5"
+        hashPath = path.join outputDir, projectName, "static", "premunged-static-contents-hash.md5"
 
         try
             hashPath = path.join outputDir, projectName, "static-#{version}", "premunged-static-contents-hash.md5"
