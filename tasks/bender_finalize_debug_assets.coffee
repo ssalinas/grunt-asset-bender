@@ -28,14 +28,14 @@ module.exports = (grunt) ->
             grunt.log.writeln "Copying debug assets over to #{outputDir}/#{versionWithPrefix}-debug\n"
             utils.moveSync path.join(debugOutputDir, projectName, versionWithPrefix), path.join(outputDir, projectName, "#{versionWithPrefix}-debug")
 
-            string1 = "\\/static-([0-9]+\\.[0-9]+)\\/"
-            string2 = "\\/static-\\1-debug\\/"
+            string1 = """(\\/|\\"|\\')static-([0-9]+\\.[0-9]+)(\\/|\\"|\\')"""
+            string2 = "\\1\\/static-\\2-debug\\3"
 
             # Change debug links from /static-x.y/ -> /static-x.y-debug/
-            sedCmd = "find #{outputDir}/#{projectName}/#{versionWithPrefix} -type f -iname '*.bundle-expanded.html' -print0 | xargs -0 sed -i'.sedbak' -r 's/#{string1}/#{string2}/g'"
+            sedCmd = "find #{outputDir}/#{projectName}/#{versionWithPrefix} -type f -iname '*.bundle-expanded.html' -print0 | xargs -0 sed -i'.sedbak' -r \"s/#{string1}/#{string2}/g\""
 
             # Change the debug html assets to point to /static-x.y-debug/ resources
-            sedCmd2 = "find #{outputDir}/#{projectName}/#{versionWithPrefix}-debug -type f -iname '*.html' -print0 | xargs -0 sed -i'.sedbak' -r 's/#{string1}/#{string2}/g'"
+            sedCmd2 = "find #{outputDir}/#{projectName}/#{versionWithPrefix}-debug -type f -iname '*.html' -print0 | xargs -0 sed -i'.sedbak' -r \"s/#{string1}/#{string2}/g\""
 
             # Macs use a different flag for extended regexes
             extendedOptionRegex = /\s+-r\s+/g
