@@ -29,7 +29,7 @@ module.exports = (grunt) ->
             utils.moveSync path.join(debugOutputDir, projectName, versionWithPrefix), path.join(outputDir, projectName, "#{versionWithPrefix}-debug")
 
             string1 = """(\\/|\\"|\\')static-([0-9]+\\.[0-9]+)(\\/|\\"|\\')"""
-            string2 = "\\1\\/static-\\2-debug\\3"
+            string2 = "\\1static-\\2-debug\\3"
 
             # Change debug links from /static-x.y/ -> /static-x.y-debug/
             sedCmd = "find #{outputDir}/#{projectName}/#{versionWithPrefix} -type f -iname '*.bundle-expanded.html' -print0 | xargs -0 sed -i'.sedbak' -r \"s/#{string1}/#{string2}/g\""
