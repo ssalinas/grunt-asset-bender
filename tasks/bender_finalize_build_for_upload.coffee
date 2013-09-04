@@ -13,7 +13,6 @@ module.exports = (grunt) ->
                        [
                            'bender_insert_version_into_source_folder',
                            'bender_build_pointers',
-                           'bender_create_fixed_dependencies_file',
                            'bender_copy_necessary_config_into_python_module',
                            'bender_create_archive_from_build_output',
                            'bender_interpolate_versions_in_source',
