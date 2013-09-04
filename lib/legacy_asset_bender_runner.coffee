@@ -37,6 +37,7 @@ exports.init = (grunt) ->
             @domain = options.domain
             @fixedDepsPath = options.fixedDepsPath
             @headless = options.headless
+            @usePrebuilt = options.usePrebuilt
             @debug = options.debug
 
             # other (non-hs-static) options
@@ -77,6 +78,7 @@ exports.init = (grunt) ->
         basicFlagFunctions =
             headlessFlag:         "--headless"
             debugFlag:            "--debug"
+            usePrebuiltFlag:          "--use-prebuilt-static-conf"
 
         for own funcName, flag of basicOptionFunctions
             do (funcName, flag) ->

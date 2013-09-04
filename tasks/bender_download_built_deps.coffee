@@ -25,6 +25,9 @@ module.exports = (grunt) ->
             builtArchiveDir: path.join tempDir, 'built-archive'
             assetBenderPath: grunt.config.get 'bender.assetBenderDir'
 
+            # Ensure the same dep versions from update-deps are downloaded
+            usePrebuilt: true
+
         useLocalMirrorSetting = utils.envVarEnabled('USE_LOCAL_ARCHIVE_MIRROR', true)
 
         if not options.mirrorArchiveDir and useLocalMirrorSetting
@@ -36,7 +39,6 @@ module.exports = (grunt) ->
 
         runner = new LegacyAssetBenderRunner _.extend options,
             command: 'download-built-deps'
-            # archiveDir: options.archiveDir
             destDir: options.builtArchiveDir
             mirrorArchiveDir: options.mirrorArchiveDir
 
