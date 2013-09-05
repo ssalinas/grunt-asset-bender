@@ -33,6 +33,7 @@ exports.init = (grunt) ->
             @restrict = options.restrict
             @archiveDir = options.archiveDir
             @mirrorArchiveDir = options.mirrorArchiveDir
+            @globalAssetsDir = options.globalAssetsDir
             @tempDir = options.tempDir
             @domain = options.domain
             @fixedDepsPath = options.fixedDepsPath
@@ -74,6 +75,7 @@ exports.init = (grunt) ->
             archiveDirOption:        "--archive-dir"
             mirrorArchiveDirOption:  "--mirror-archive-dir"
             fixedDepsPathOption:     "--fixed-deps-path"
+            globalAssetsDirOption:   "--global-assets-dir"
 
         basicFlagFunctions =
             headlessFlag:         "--headless"

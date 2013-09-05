@@ -57,6 +57,7 @@ module.exports = (grunt) ->
             buildVersions: buildVersions
             archiveDir: grunt.config.get 'bender.build.archiveDir'
             tempDir: "#{grunt.config.get 'bender.build.sprocketsCacheDir'}-debug"
+            globalAssetsDir: path.join(grunt.config.get('bender.build.tempDir'), 'hs-static-global')
             domain: grunt.config.get 'bender.build.forcedDomain'
 
         do (debugOptions) ->
