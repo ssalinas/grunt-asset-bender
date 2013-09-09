@@ -39,21 +39,22 @@ module.exports = (grunt) ->
                     string1 = "#{depName}\\/static\\/"
                     string2 = "#{depName}\\/#{depVersion}\\/"
 
-                    sedCmd = "find #{projectDir}/#{versionWithPrefix} -type f -print0 | xargs -0 sed -i'.sedbak' 's/#{string1}/#{string2}/g'"
+                    # sedCmd = "find #{projectDir}/#{versionWithPrefix} -type f -print0 | xargs -0 sed -i '' 's/#{string1}/#{string2}/g'"
 
-                    utils.executeCommand(sedCmd).fail (err) ->
+                    utils.findAndReplace
+                        sourceDirectory: path.join projectDir, versionWithPrefix
+                        commands: "'s/#{string1}/#{string2}/g'"
+                    .fail (err) ->
                         grunt.fail.warn "Error munging build names for #{depName} to #{depVersion}: #{err}"
 
         # Run the sed tasks sequentially
         if sedTasks
             firstTask = sedTasks.shift()
             result = Q(firstTask)
-            console.log "result", result
 
             sedTasks.forEach (task) ->
                 result = result.then(task);
                 sedPromises.push result
 
         Q.all(sedPromises).finally ->
-            utils.executeCommand("find #{projectDir} -type f -name '*.sedbak' -print0 | xargs -0 rm").finally ->
-                done()
+            done()

@@ -66,11 +66,20 @@ module.exports = (grunt) ->
                 requirejsConfig.paths[module] = path = path[path.length - 1].replace('//static2cdn.hubspot.com/', '')
 
         # Change hubspot.define -> define() and hubspot.require -> require() (also the first string arg in hubspot.define)
-        numCPUs = Math.max(require('os').cpus().length / 2, 1)
-        grunt.log.writeln "Rewrite hubspot.define() and hubspot.require() to define()/require() so the optimizer traverses dependencies correctly (on #{numCPUs} cores)"
-        sedCmd = "find #{builtArchiveDir} -type f -iname '*.js' -print0 | xargs -P #{numCPUs} -0 sed -i'.sedbak' -e 's/hubspot.require/require/g' -e 's/hubspot.define([^,[]*,/hubspot.define(/g' -e 's/hubspot.define/define/g'"
 
-        utils.executeCommand(sedCmd).done ->
+        grunt.log.writeln "Rewrite hubspot.define() and hubspot.require() to define()/require() so the optimizer traverses dependencies correctly (on #{numCPUs} cores)"
+
+        # sedCmd = "find #{builtArchiveDir} -type f -iname '*.js' -print0 | xargs -P #{numCPUs} -0 sed -i '' -e 's/hubspot.require/require/g' -e 's/hubspot.define([^,[]*,/hubspot.define(/g' -e 's/hubspot.define/define/g'"
+        utils.findAndReplace
+            sourceDirectory: builtArchiveDir
+            filesToReplace: '*.js'
+            parallel: true
+            commands: [
+                's/hubspot.require/require/g'
+                's/hubspot.define([^,[]*,/hubspot.define(/g'
+                's/hubspot.define/define/g'
+            ]
+        .done ->
             grunt.config.set 'requirejs.compile.options', requirejsConfig
 
             grunt.log.writeln "Requirejs optimizer config: "

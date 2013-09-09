@@ -10,12 +10,10 @@ module.exports = (grunt) ->
         done = @async()
 
         grunt.config.requires 'bender.build.projectName',
-                              'bender.build.versionWithStaticPrefix',
-                              'bender.build.isGNU'
+                              'bender.build.versionWithStaticPrefix'
 
         projectName        = grunt.config.get 'bender.build.projectName'
         versionWithPrefix  = grunt.config.get 'bender.build.versionWithStaticPrefix'
-        isGNU              = grunt.config.get 'bender.build.isGNU'
 
         outputDir          = grunt.config.get 'bender.build.compressed.outputDir'
         debugOutputDir     = grunt.config.get 'bender.build.development.outputDir'
@@ -32,35 +30,31 @@ module.exports = (grunt) ->
             string2 = "\\1static-\\2-debug\\3"
 
             # Change debug links from /static-x.y/ -> /static-x.y-debug/
-            sedCmd = "find #{outputDir}/#{projectName}/#{versionWithPrefix} -type f -iname '*.bundle-expanded.html' -print0 | xargs -0 sed -i'.sedbak' -r \"s/#{string1}/#{string2}/g\""
-
-            # Change the debug html assets to point to /static-x.y-debug/ resources
-            sedCmd2 = "find #{outputDir}/#{projectName}/#{versionWithPrefix}-debug -type f -iname '*.html' -print0 | xargs -0 sed -i'.sedbak' -r \"s/#{string1}/#{string2}/g\""
-
-            # Macs use a different flag for extended regexes
-            extendedOptionRegex = /\s+-r\s+/g
-            sedCmd = sedCmd.replace(extendedOptionRegex, ' -E ') unless isGNU
-            sedCmd2 = sedCmd2.replace(extendedOptionRegex, ' -E ') unless isGNU
+            # sedCmd = "find #{outputDir}/#{projectName}/#{versionWithPrefix} -type f -iname '*.bundle-expanded.html' -print0 | xargs -0 sed -i '' -r \"s/#{string1}/#{string2}/g\""
 
             grunt.log.writeln "Pointing links in *.bundle-expanded.html to the debug folder"
-
-            utils.executeCommand(sedCmd).fail ->
+            sedPromise1 = utils.findAndReplace
+                sourceDirectory: path.join(outputDir, projectName, versionWithPrefix)
+                filesToReplace: "*.bundle-expanded.html"
+                useExtendedRegex: true
+                commands: "\"s/#{string1}/#{string2}/g\""
+            .fail ->
                 grunt.log.writeln "Error munging build names from \"/static/\" to \'#{versionWithPrefix}\". Continuing..."
-            .finally ->
 
-                grunt.log.writeln "Pointing links in compiled html templates in the debug folder to other debug assets"
+            # Change the debug html assets to point to /static-x.y-debug/ resources
+            # sedCmd2 = "find #{outputDir}/#{projectName}/#{versionWithPrefix}-debug -type f -iname '*.html' -print0 | xargs -0 sed -i '' -r \"s/#{string1}/#{string2}/g\""
 
-                utils.executeCommand(sedCmd2).fail ->
-                    grunt.log.writeln "Error munging build names from \"/static/\" to \'#{versionWithPrefix}\" in compiled debug templates. Continuing..."
-                .finally ->
-                    removeSedBackups1 = "find #{outputDir}/#{projectName}/#{versionWithPrefix} -type f -name '*.sedbak' -print0 | xargs -0 rm"
-                    removeSedBackups2 = "find #{outputDir}/#{projectName}/#{versionWithPrefix}-debug -type f -name '*.sedbak' -print0 | xargs -0 rm"
+            grunt.log.writeln "Pointing links in compiled html templates in the debug folder to other debug assets"
+            sedPromise2 = utils.findAndReplace
+                sourceDirectory: path.join(outputDir, projectName, "#{versionWithPrefix}-debug")
+                filesToReplace: "*.html"
+                useExtendedRegex: true
+                commands: "\"s/#{string1}/#{string2}/g\""
+            .fail ->
+                grunt.log.writeln "Error munging build names from \"/static/\" to \'#{versionWithPrefix}\" in compiled debug templates. Continuing..."
 
-                    Q.all(
-                        utils.executeCommand(removeSedBackups1),
-                        utils.executeCommand(removeSedBackups2)
-                    ).finally ->
-                        done()
+            Q.all([sedPromise1, sedPromise2]).finally ->
+                done()
 
         # If we didn't build any debug assets (since DONT_COMPRESS_STATIC was set), copy the precompiled output to '/static-x.y-debug/' verbatim
         else if not builtDebugAssets

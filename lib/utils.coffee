@@ -3,6 +3,7 @@ path = require 'path'
 Q = require 'q'
 graphite = require 'graphite'
 _ = require 'underscore'
+{ inspect } = require 'util'
 { spawn } = require 'child_process'
 
 { DualGraphiteStopwatch, FauxGraphiteStopwatch } = require '../lib/graphiteStopwatch.coffee'
@@ -169,6 +170,64 @@ exports.init = (grunt) ->
             grunt.log.writeln result.stdoutAndStderr
             grunt.fail.warn "Error getting project_info for #{projectName}"
 
+
+    # A helper method to compose a find and replace command made of up find, xargs, and sed
+    findAndReplace = (options={}) ->
+        grunt.config.requires 'bender.build.isGNU'
+
+        commands = options.command || options.commands
+        commands = [commands] if not Array.isArray(commands)
+
+        parts = []
+
+        # Start the find part (find ... -type f -print0)
+        parts.push 'find', options.sourceDirectory, '-type', 'f'
+
+        if options.filesToReplace
+            parts.push '-name', "'#{options.filesToReplace}'"
+
+        # Ignore hidden, binary, and image types (not-exhaustive)
+        typesToIgnore = [
+            '.*'
+            '*.gif'
+            '*.jpg'
+            '*.png'
+            '*.eps'
+            '*.ico'
+            '*.ai'
+            '*.swf'
+        ]
+
+        for extension in typesToIgnore
+            parts.push '-not', '-name', "'#{extension}'"
+
+        parts.push '-print0'
+
+        # Start xargs part (xargs -0 sed -i '' -e ...)
+        parts.push '|', 'xargs'
+
+        if options.parallel
+            numCPUs = Math.max(require('os').cpus().length / 2, 1)
+            parts.push '-P', numCPUs
+
+        parts.push '-0', 'sed', '-i', "''"
+
+        # Macs use a different flag for extended regexes
+        if options.useExtendedRegex and not grunt.config.get('bender.build.isGNU')
+            parts.push '-E'
+        else if options.useExtendedRegex
+            parts.push '-r'
+
+        for command in commands
+            parts.push '-e', command
+
+        # Yeah, joining and execing a whole string is gross... (too lazy right now
+        # to re-do the escaping on all the uses of this command)
+        sedCmd = parts.join ' '
+
+        executeCommand(sedCmd)
+
+
     innerExports = {
         expandHomeDirectory
         preferredModeBuilt
@@ -183,4 +242,5 @@ exports.init = (grunt) ->
         moveSync
         copyFileSync
         benderInfoForProject
+        findAndReplace
     }
