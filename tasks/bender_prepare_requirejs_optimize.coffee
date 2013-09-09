@@ -67,7 +67,7 @@ module.exports = (grunt) ->
 
         # Change hubspot.define -> define() and hubspot.require -> require() (also the first string arg in hubspot.define)
 
-        grunt.log.writeln "Rewrite hubspot.define() and hubspot.require() to define()/require() so the optimizer traverses dependencies correctly (on #{numCPUs} cores)"
+        grunt.log.writeln "Rewrite hubspot.define() and hubspot.require() to define()/require() so the optimizer traverses dependencies correctly (on #{utils.numCPUs()} cores)"
 
         # sedCmd = "find #{builtArchiveDir} -type f -iname '*.js' -print0 | xargs -P #{numCPUs} -0 sed -i '' -e 's/hubspot.require/require/g' -e 's/hubspot.define([^,[]*,/hubspot.define(/g' -e 's/hubspot.define/define/g'"
         utils.findAndReplace

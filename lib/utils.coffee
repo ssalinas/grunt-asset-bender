@@ -170,6 +170,8 @@ exports.init = (grunt) ->
             grunt.log.writeln result.stdoutAndStderr
             grunt.fail.warn "Error getting project_info for #{projectName}"
 
+    numCPUs = ->
+        Math.max(require('os').cpus().length / 2, 1)
 
     # A helper method to compose a find and replace command made of up find, xargs, and sed
     findAndReplace = (options={}) ->
@@ -207,8 +209,7 @@ exports.init = (grunt) ->
         parts.push '|', 'xargs'
 
         if options.parallel
-            numCPUs = Math.max(require('os').cpus().length / 2, 1)
-            parts.push '-P', numCPUs
+            parts.push '-P', numCPUs()
 
         parts.push '-0', 'sed', '-i', "''"
 
@@ -242,5 +243,6 @@ exports.init = (grunt) ->
         moveSync
         copyFileSync
         benderInfoForProject
+        numCPUs
         findAndReplace
     }
