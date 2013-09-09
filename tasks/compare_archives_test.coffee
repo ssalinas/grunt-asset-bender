@@ -4,7 +4,6 @@ path          = require 'path'
 glob          = require 'glob'
 mkdirp        = require 'mkdirp'
 rimraf        = require 'rimraf'
-{ Dir_Diff }  = require 'node-dir-diff'
 { exec }      = require 'execSync'
 { inspect }   = require 'util'
 
