@@ -211,7 +211,14 @@ exports.init = (grunt) ->
         if options.parallel
             parts.push '-P', numCPUs()
 
-        parts.push '-0', 'sed', '-i', "''"
+        parts.push '-0', 'sed'
+
+
+        # Macs are slightly different with inplace editing
+        if not grunt.config.get('bender.build.isGNU')
+            parts.push '-i', "''"
+        else
+            parts.push "-i''"
 
         # Macs use a different flag for extended regexes
         if options.useExtendedRegex and not grunt.config.get('bender.build.isGNU')
