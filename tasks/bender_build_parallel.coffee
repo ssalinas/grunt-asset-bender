@@ -12,10 +12,11 @@ module.exports = (grunt) ->
 
         try
             hashPath = path.join outputDir, projectName, "static-#{version}", "premunged-static-contents-hash.md5"
-            grunt.file.read path
+            grunt.file.read hashPath
         catch err
             try
                 hashPath = path.join outputDir, projectName, "static", "premunged-static-contents-hash.md5"
+                grunt.file.read hashPath
             catch err
                 grunt.log.writeln "Couldn't read #{hashPath}, this might be an empty static project."
 
