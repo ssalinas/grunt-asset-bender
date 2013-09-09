@@ -75,9 +75,9 @@ module.exports = (grunt) ->
             filesToReplace: '*.js'
             parallel: true
             commands: [
-                's/hubspot.require/require/g'
-                's/hubspot.define([^,[]*,/hubspot.define(/g'
-                's/hubspot.define/define/g'
+                "'s/hubspot.require/require/g'"
+                "'s/hubspot.define([^,[]*,/hubspot.define(/g'"
+                "'s/hubspot.define/define/g'"
             ]
         .done ->
             grunt.config.set 'requirejs.compile.options', requirejsConfig
