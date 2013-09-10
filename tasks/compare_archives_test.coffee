@@ -1,4 +1,4 @@
-Q             = require 'Q'
+Q             = require 'q'
 fs            = require 'fs'
 path          = require 'path'
 glob          = require 'glob'
