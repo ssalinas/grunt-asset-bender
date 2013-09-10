@@ -11,7 +11,7 @@ module.exports = (grunt) ->
     grunt.registerTask 'bender_copy_necessary_config_into_python_module', 'Tars up the compiled output', ->
 
         grunt.config.requires 'bender.build.projectName',
-                              'bender.build.copiedProjectDir',
+                              'bender.build.originalProjectDir',
                               'bender.build.archiveDir',
                               'bender.build.version',
                               'bender.build.versionWithStaticPrefix',
@@ -19,17 +19,18 @@ module.exports = (grunt) ->
                               'bender.build.isCurrentVersion'
 
         projectName        = grunt.config.get 'bender.build.projectName'
-        projectDir         = grunt.config.get 'bender.build.copiedProjectDir'
+        originalProjectDir = grunt.config.get 'bender.build.originalProjectDir'
         versionWithPrefix  = grunt.config.get 'bender.build.versionWithStaticPrefix'
+        outputDir          = utils.preferredOutputDir()
 
-        fromDir            = path.join projectDir, 'static'
-        pythonModuleDir    = path.join projectDir, projectName
+        fromDir            = path.join outputDir, projectName, versionWithPrefix
+        pythonModuleDir    = path.join originalProjectDir, projectName
 
         if not fs.existsSync path.join(pythonModuleDir, '__init__.py')
             grunt.log.writeln "Warning, no such #{pythonModuleDir} module folder, looking for the first subdirectory with an __init__.py"
 
             # Search for all directories that contain an __init__.py
-            allPythonDirs = glob.sync(path.join(projectDir, '*')).filter (potentialModuleDir) ->
+            allPythonDirs = glob.sync(path.join(originalProjectDir, '*')).filter (potentialModuleDir) ->
                 fs.existsSync path.join(potentialModuleDir, '__init__.py')
 
             grunt.verbose.writeln "All python module dirs: #{allPythonDirs.join(', ')}" if allPythonDirs
@@ -38,11 +39,11 @@ module.exports = (grunt) ->
             pythonModuleDir = allPythonDirs[0]
 
         if pythonModuleDir
-            grunt.log.writeln "Copying static_conf.json and prebuilt_recursive_static_conf.json from #{from_dir} to #{pythonModuleDir}/static/ (so it will work via egg/venv install)"
+            grunt.log.writeln "Copying static_conf.json and prebuilt_recursive_static_conf.json from #{fromDir} to #{pythonModuleDir}/static/ (so it will work via egg/venv install)"
 
             mkdirp.sync path.join pythonModuleDir, 'static'
-            utils.copyFileSync path.join(from_dir, 'static_conf.json'),  path.join(pythonModuleDir, 'static', 'static_conf.json')
-            utils.copyFileSync path.join(from_dir, 'prebuilt_recursive_static_conf.json'),  path.join(pythonModuleDir, 'static', 'prebuilt_recursive_static_conf.json')
-            utils.copyFileSync path.join(from_dir, 'info.txt'),  path.join(pythonModuleDir, 'static', 'info.txt')
+            utils.copyFileSync path.join(fromDir, 'info.txt'),  path.join(pythonModuleDir, 'static', 'info.txt')
+            utils.copyFileSync path.join(fromDir, 'static_conf.json'),  path.join(pythonModuleDir, 'static', 'static_conf.json')
+            utils.copyFileSync path.join(fromDir, 'prebuilt_recursive_static_conf.json'),  path.join(pythonModuleDir, 'static', 'prebuilt_recursive_static_conf.json')
         else
             grunt.log.writeln "Assuming this is not a python/django project, no module folder could be found."
