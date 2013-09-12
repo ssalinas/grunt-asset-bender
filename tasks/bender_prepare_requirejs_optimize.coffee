@@ -63,7 +63,7 @@ module.exports = (grunt) ->
         # (we are assuming that the last fallback is always local)
         for module, path of requirejsConfig.paths
             if _.isArray path
-                requirejsConfig.paths[module] = path = path[path.length - 1].replace('//static2cdn.hubspot.com/', '')
+                requirejsConfig.paths[module] = path = path[path.length - 1].replace('//static2cdn.hubspot.(com|net)/', '')
 
         # Change hubspot.define -> define() and hubspot.require -> require() (also the first string arg in hubspot.define)
 
