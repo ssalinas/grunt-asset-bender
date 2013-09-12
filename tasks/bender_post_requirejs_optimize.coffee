@@ -11,6 +11,9 @@ module.exports = (grunt) ->
 
         requirejsConfig     = grunt.config.get 'requirejs.compile.options'
         outputDir           = utils.preferredOutputDir(grunt)
+        stopwatch           = utils.graphiteStopwatch(grunt)
+
+        stopwatch.stop('requirejs_optimizer')
 
         for module in requirejsConfig.modules
           modulePath = path.join requirejsConfig.dir, "#{module.name}.js"

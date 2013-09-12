@@ -31,5 +31,7 @@ module.exports = (grunt) ->
         utils.executeCommand(cmd, outputDir).fail ->
             grunt.fail.warn "Error uploading static files to S3!"
         .finally ->
+            stopwatch.stop 'uploading_to_s3'
             stopwatch.stop 'total_build_duration'
+
             done()

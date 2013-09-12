@@ -28,6 +28,7 @@ module.exports = (grunt) ->
         builtArchiveDir     = grunt.config.get('bender.build.builtArchiveDir')
         debugOutputDir      = grunt.config.get 'bender.build.development.outputDir'
         outputDir           = utils.preferredOutputDir(grunt)
+        stopwatch           = utils.graphiteStopwatch(grunt)
 
         configThatShouldntBeAlreadySet = [
             'baseUrl',
@@ -84,5 +85,7 @@ module.exports = (grunt) ->
 
             grunt.log.writeln "Requirejs optimizer config: "
             grunt.log.writeln JSON.stringify(requirejsConfig, null, 4)
+
+            stopwatch.start('requirejs_optimizer')
 
             done()
