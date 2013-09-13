@@ -25,8 +25,9 @@ module.exports = (grunt) ->
         projectName         = grunt.config.get 'bender.build.projectName'
         requirejsConfig     = grunt.config.get 'requirejs.compile.options'
         versionWithPrefix   = grunt.config.get 'bender.build.versionWithStaticPrefix'
-        builtArchiveDir     = grunt.config.get('bender.build.builtArchiveDir')
+        builtArchiveDir     = grunt.config.get 'bender.build.builtArchiveDir'
         debugOutputDir      = grunt.config.get 'bender.build.development.outputDir'
+        assetCDNRegex       = grunt.config.get 'bender.assetCDNRegex'
         outputDir           = utils.preferredOutputDir(grunt)
         stopwatch           = utils.graphiteStopwatch(grunt)
 
@@ -64,7 +65,7 @@ module.exports = (grunt) ->
         # (we are assuming that the last fallback is always local)
         for module, path of requirejsConfig.paths
             if _.isArray path
-                requirejsConfig.paths[module] = path = path[path.length - 1].replace('//static2cdn.hubspot.(com|net)/', '')
+                requirejsConfig.paths[module] = path = path[path.length - 1].replace(assetCDNRegex, '')
 
         # Change hubspot.define -> define() and hubspot.require -> require() (also the first string arg in hubspot.define)
 

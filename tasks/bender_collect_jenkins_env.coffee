@@ -11,7 +11,7 @@ module.exports = (grunt) ->
 
     setRequiredBuildConfig = (key, value) ->
         grunt.warn "Can't continue build, #{key} isn't set" unless value?
-        grunt.config.set(key, value)
+        grunt.config.set(key, value) unless grunt.config.get(key)
 
     grunt.registerTask 'bender_collect_jenkins_env', 'Extracts current jenkins build enviornment and makes it available to other grunt tasks', ->
         done = @async()
@@ -24,6 +24,7 @@ module.exports = (grunt) ->
         setRequiredBuildConfig 'bender.build.root', process.env.JENKINS_ROOT
         setRequiredBuildConfig 'bender.build.scmRev', process.env.GIT_COMMIT or process.env.SVN_REVISION
         setRequiredBuildConfig 'bender.build.forcedDomain', process.env.FORCED_STATIC_DOMAIN or "static2cdn.hubspot.com"
+        setRequiredBuildConfig 'bender.assetCDNRegex', '/\/\/static2cdn.hubspot.(com|net)/'
         setRequiredBuildConfig 'bender.assetBenderDir', process.env.HS_STATIC_REPO_DIR
 
         origProjectDir = grunt.config.get 'bender.build.originalProjectDir'
