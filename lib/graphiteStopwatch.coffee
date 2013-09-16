@@ -5,6 +5,7 @@ class GraphiteStopwatch
     @client = graphiteClient
 
   _start: (name) ->
+    console.log "Starting graphite '#{name}' timer"
     @start_times = @start_times ? {}
     @start_times[name] = new Date() if name
 
@@ -29,6 +30,7 @@ class GraphiteStopwatch
     @_write metrics
     delete @start_times[name]
 
+    console.log "Stopped graphite '#{name}' timer: #{durationInSeconds}"
     durationInSeconds
 
   stop: (name) ->

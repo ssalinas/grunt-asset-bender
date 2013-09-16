@@ -114,20 +114,24 @@ module.exports = (grunt) ->
         setRequiredBuildConfig 'bender.build.version', "#{majorVersion}.#{minorVersion}"
         setRequiredBuildConfig 'bender.build.versionWithStaticPrefix', "static-#{majorVersion}.#{minorVersion}"
 
-        # Output all build config when --verbose
-        grunt.verbose.writeln "Current build config:"
-        formattedConfig = JSON.stringify grunt.config.get('bender.build'), null, 2
-        formattedConfig = formattedConfig.replace '\n', '\n  '
-        grunt.verbose.writeln formattedConfig
-
-
         # Graphite client for other tasks to use
         grunt.config.set 'bender.graphite.server', process.env.GRAPHITE_SERVER
         grunt.config.set 'bender.graphite.port', process.env.GRAPHITE_PORT
         grunt.config.set 'bender.graphite.namespace', process.env.GRAPHITE_NAMESPACE
 
-        utils.graphiteStopwatch(grunt).start('total_build_duration')
+        grunt.log.writeln "process.env.GRAPHITE_SERVER", process.env.GRAPHITE_SERVER
+        grunt.log.writeln "process.env.GRAPHITE_PORT", process.env.GRAPHITE_PORT
+        grunt.log.writeln "process.env.GRAPHITE_NAMESPACE", process.env.GRAPHITE_NAMESPACE
 
+
+        # Output all build config when --verbose
+        grunt.verbose.writeln "Current build config:"
+        formattedConfig = JSON.stringify grunt.config.get('bender'), null, 2
+        formattedConfig = formattedConfig.replace '\n', '\n  '
+        grunt.verbose.writeln formattedConfig
+
+
+        utils.graphiteStopwatch(grunt).start('total_build_duration')
 
         # Store whether the command line tools are GNU-style for future tasks
         utils.isGNU().done (isGNU) ->
