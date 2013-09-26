@@ -19,6 +19,7 @@ module.exports = (grunt) ->
         stopwatch  = utils.graphiteStopwatch(grunt)
 
         hasSpecs = fs.existsSync path.join projectDir, '/static/test/specs.js'
+        hasSpecs = fs.existsSync path.join projectDir, '/static/test/specs.coffee' if not hasSpecs
         runJasmineTests = utils.envVarEnabled('RUN_JASMINE_TESTS', true)
 
         runTestOn = utils.preferredModeBuilt()
