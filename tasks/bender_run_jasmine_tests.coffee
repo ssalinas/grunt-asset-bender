@@ -25,11 +25,11 @@ module.exports = (grunt) ->
 
         runTestOn = utils.preferredModeBuilt()
 
-        if hasSpecs and (runJasmineTests == '0' or runJasmineTests == 'false')
+        if hasSpecs and not runJasmineTests
             grunt.log.writeln "Skipping jasmine tests since RUN_JASMINE_TESTS=#{runJasmineTests}\n"
             done()
 
-        else if hasSpecs
+        else if hasSpecs and runJasmineTests
             grunt.log.writeln "Running jasmine tests\n"
 
             buildVersions = {}
