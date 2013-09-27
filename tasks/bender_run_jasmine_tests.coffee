@@ -36,6 +36,7 @@ module.exports = (grunt) ->
             buildVersions[grunt.config.get 'bender.build.projectName'] = grunt.config.get 'bender.build.version'
 
             runner = new LegacyAssetBenderRunner _.extend {},
+                assetBenderPath: grunt.config.get 'bender.assetBenderDir'
                 project: projectDir
                 destDir:  outputDir
                 archiveDir: grunt.config.get 'bender.build.archiveDir'
