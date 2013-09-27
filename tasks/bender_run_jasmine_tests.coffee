@@ -33,7 +33,7 @@ module.exports = (grunt) ->
             buildVersions = {}
             buildVersions[grunt.config.get 'bender.build.projectName'] = grunt.config.get 'bender.build.versionWithStaticPrefix'
 
-            runner = new LegacyAssetBenderRunner _.extend {}, options,
+            runner = new LegacyAssetBenderRunner _.extend {},
                 project: projectDir
                 destDir:  grunt.config.get 'bender.build.#{runTestsOn}.outputDir'
                 archiveDir: grunt.config.get 'bender.build.archiveDir'
