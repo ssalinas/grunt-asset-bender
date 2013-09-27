@@ -16,6 +16,7 @@ module.exports = (grunt) ->
                               'bender.build.versionWithStaticPrefix'
 
         projectDir = grunt.config.get 'bender.build.copiedProjectDir'
+        outputDir  = utils.preferredOutputDir(grunt)
         stopwatch  = utils.graphiteStopwatch(grunt)
 
         hasSpecs = fs.existsSync path.join projectDir, '/static/test/specs.js'
@@ -32,11 +33,11 @@ module.exports = (grunt) ->
             grunt.log.writeln "Running jasmine tests\n"
 
             buildVersions = {}
-            buildVersions[grunt.config.get 'bender.build.projectName'] = grunt.config.get 'bender.build.versionWithStaticPrefix'
+            buildVersions[grunt.config.get 'bender.build.projectName'] = grunt.config.get 'bender.build.version'
 
-            runner = new LegacyAssetBenderRunner _.extend {}, options,
+            runner = new LegacyAssetBenderRunner _.extend {},
                 project: projectDir
-                destDir:  grunt.config.get 'bender.build.#{runTestsOn}.outputDir'
+                destDir:  outputDir
                 archiveDir: grunt.config.get 'bender.build.archiveDir'
                 mode: 'precompiled'
                 command: 'jasmine'
@@ -45,12 +46,13 @@ module.exports = (grunt) ->
 
             stopwatch.start 'jasmine_test_duration'
 
-            runner.run().done ->
+            runner.run().then ->
                 grunt.log.writeln 'Jasmine tests succeeded.'
-                done()
             .fail ->
                 stopwatch.stop 'jasmine_test_duration'
                 done new Error 'Jasmine tests failed, failing build.'
+            .done ->
+                done()
 
         else
             grunt.log.writeln "No jasmine tests to run"
