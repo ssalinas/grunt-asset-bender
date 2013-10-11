@@ -198,10 +198,12 @@ exports.init = (grunt) ->
             '*.ico'
             '*.ai'
             '*.swf'
+            '*.cur'
+            '*.pdn'
         ]
 
         for extension in typesToIgnore
-            parts.push '-not', '-name', "'#{extension}'"
+            parts.push '-not', '-iname', "'#{extension}'"
 
         parts.push '-print0'
 
