@@ -45,13 +45,8 @@ module.exports = (grunt) ->
 
 
         # Custom tmp directory for hs-static
-        persistedCacheDir = "#{grunt.config.get 'bender.build.workspace'}/hs-static-tmp-persisted"
-        shouldPersistCache = utils.envVarEnabled('PERSIST_HS_STATIC_CACHE', true)
-
-        # Get rid of this if the "depend asset on dep versions" features ever gets implemented
-        if shouldPersistCache
-            shouldPersistCache = false
-            grunt.log.error "Requirejs builds currently don't support persisting the cache. Forcing a new cache."
+        persistedCacheDir = "#{grunt.config.get 'bender.build.cacheDir'}/hs-static-tmp-persisted"
+        shouldPersistCache = utils.envVarEnabled('PERSIST_HS_STATIC_CACHE', false)
 
         if shouldPersistCache
             # If configured, keep the static cache between builds

@@ -23,6 +23,8 @@ module.exports = (grunt) ->
         benderS3AccessKeyId:     'BENDER_S3_ACCESS_KEY_ID'
         benderS3SecretAccessKey: 'BENDER_S3_SECRET_ACCESS_KEY'
 
+        persistStaticCache:      'PERSIST_HS_STATIC_CACHE'
+
 
         # forcedMajorVersion: 'FORCED_MAJOR_VERSION',
         # currentStaticVersion: 'CURRENT_STATIC_VERSION',
@@ -69,6 +71,8 @@ module.exports = (grunt) ->
             cacheDir:         "/tmp/cache-dir/#{job}"
             jenkinsTools:     utils.expandHomeDirectory('~/dev/src/JenkinsTools')
             buildNumber:      '1'
+
+            persistStaticCache: false
 
             pythonBin:               '/usr/bin/python'
             staticDeployPython:      '/usr/bin/python'
