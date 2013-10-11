@@ -11,6 +11,7 @@ module.exports = (grunt) ->
         workspace:       'WORKSPACE'
         projectPath:     'PROJECT_PATH'
         hsStaticRepoDir: 'HS_STATIC_REPO_DIR'
+        cacheDir:        'CACHE_DIR'
         jenkinsTools:    'JENKINS_TOOLS'
         buildNumber:     'BUILD_NUMBER'
         gitCommit:       'GIT_COMMIT'
@@ -57,12 +58,15 @@ module.exports = (grunt) ->
             grunt.log.error "~/.hubspot/bender_s3_creds doesn't exist. You'll need it do be able to upload to s3 locally\n"
 
     grunt.registerTask 'bender_fake_jenkins_env_for_testing', '', ->
+        job = path.basename(process.cwd())
+
         options = @options
-            jobName:          path.basename(process.cwd())
+            jobName:          job
             jenkinsRoot:      '/tmp/jenkins-root'
             workspace:        process.cwd()
             projectPath:      process.cwd()
             hsStaticRepoDir:  utils.expandHomeDirectory('~/dev/src/hubspot_static_daemon')
+            cacheDir:         "/tmp/cache-dir/#{job}"
             jenkinsTools:     utils.expandHomeDirectory('~/dev/src/JenkinsTools')
             buildNumber:      '1'
 

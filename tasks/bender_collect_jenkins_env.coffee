@@ -22,6 +22,7 @@ module.exports = (grunt) ->
         setRequiredBuildConfig 'bender.build.workspace', process.env.WORKSPACE
         setRequiredBuildConfig 'bender.build.originalProjectDir', process.env.PROJECT_PATH or process.env.WORKSPACE
         setRequiredBuildConfig 'bender.build.root', process.env.JENKINS_ROOT
+        setRequiredBuildConfig 'bender.build.cacheDir', process.env.CACHE_DIR
         setRequiredBuildConfig 'bender.build.scmRev', process.env.GIT_COMMIT or process.env.SVN_REVISION
         setRequiredBuildConfig 'bender.build.forcedDomain', process.env.FORCED_STATIC_DOMAIN or "static2cdn.hubspot.com"
         setRequiredBuildConfig 'bender.assetCDNRegex', /\/\/static2cdn.hubspot.(com|net)\//
@@ -35,7 +36,7 @@ module.exports = (grunt) ->
 
 
         # Tempory directories
-        setRequiredBuildConfig 'bender.build.tempDir', path.join(process.env.WORKSPACE, 'temp-for-static')
+        setRequiredBuildConfig 'bender.build.tempDir', path.join(process.env.CACHE_DIR or process.env.WORKSPACE, 'temp-for-static')
 
         tempDir = grunt.config.get 'bender.build.tempDir'
         rimraf.sync tempDir
