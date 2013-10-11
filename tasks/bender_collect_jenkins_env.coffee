@@ -91,6 +91,13 @@ module.exports = (grunt) ->
             excludeHiddenUnix: true     # .DS_Store files gunk up the sed replacements that happen later
 
 
+        # Mirror archive directory
+        if utils.envVarEnabled('USE_LOCAL_ARCHIVE_MIRROR', true)
+            mirrorParentDir = grunt.config.get('bender.build.root') or '/tmp'
+            grunt.config.set 'bender.build.mirrorArchiveDir', path.join(mirrorParentDir, 'mirrored_static_downloads')
+            mkdirp.sync grunt.config.get 'bender.build.mirrorArchiveDir'
+
+
         # Version
         forcedMajorVersion = parseInt(process.env.FORCED_MAJOR_VERSION, 10) if process.env.FORCED_MAJOR_VERSION?
         majorVersion = forcedMajorVersion or projectConfig.majorVersion or 1

@@ -28,19 +28,10 @@ module.exports = (grunt) ->
             # Ensure the same dep versions from update-deps are downloaded
             usePrebuilt: true
 
-        useLocalMirrorSetting = utils.envVarEnabled('USE_LOCAL_ARCHIVE_MIRROR', true)
-
-        if not options.mirrorArchiveDir and useLocalMirrorSetting
-            mirrorParentDir = grunt.config.get('bender.build.sharedBuildRoot') or '/tmp'
-            options.mirrorArchiveDir = path.join mirrorParentDir, 'mirrored_static_downloads'
-
-        if options.mirrorArchiveDir
-            grunt.config.set 'bender.build.mirrorArchiveDir', options.mirrorArchiveDir
-
         runner = new LegacyAssetBenderRunner _.extend options,
             command: 'download-built-deps'
             destDir: options.builtArchiveDir
-            mirrorArchiveDir: options.mirrorArchiveDir
+            mirrorArchiveDir: options.mirrorArchiveDir or grunt.config.get('bender.build.mirrorArchiveDir')
 
         stopwatch.start 'download_prebuilt_static_deps'
 

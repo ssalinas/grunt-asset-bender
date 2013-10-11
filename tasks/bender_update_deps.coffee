@@ -24,21 +24,12 @@ module.exports = (grunt) ->
             archiveDir: path.join tempDir, 'static-archive'
             assetBenderPath: grunt.config.get 'bender.assetBenderDir'
 
-        useLocalMirrorSetting = utils.envVarEnabled('USE_LOCAL_ARCHIVE_MIRROR', true)
-
-        if not options.mirrorArchiveDir and useLocalMirrorSetting
-            mirrorParentDir = grunt.config.get('bender.build.sharedBuildRoot') or '/tmp'
-            options.mirrorArchiveDir = path.join mirrorParentDir, 'mirrored_static_downloads'
-
-        if options.mirrorArchiveDir
-            grunt.config.set 'bender.build.mirrorArchiveDir', options.mirrorArchiveDir
-
         dependencyTreeOutputPath = path.join tempDir, 'dependency-tree.json'
 
         runner = new LegacyAssetBenderRunner _.extend options,
             command: 'update-deps'
             archiveDir: options.archiveDir
-            mirrorArchiveDir: options.mirrorArchiveDir
+            mirrorArchiveDir: options.mirrorArchiveDir or grunt.config.get('bender.build.mirrorArchiveDir')
             fixedDepsPath: dependencyTreeOutputPath
 
         stopwatch.start 'download_static_deps'
