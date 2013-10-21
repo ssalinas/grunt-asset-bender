@@ -88,7 +88,7 @@ module.exports = (grunt) ->
 
         # Mirror archive directory
         if utils.envVarEnabled('USE_LOCAL_ARCHIVE_MIRROR', true)
-            mirrorParentDir = grunt.config.get('bender.build.root') or '/tmp'
+            mirrorParentDir = grunt.config.get('bender.build.cacheDir') or '/tmp'
             grunt.config.set 'bender.build.mirrorArchiveDir', path.join(mirrorParentDir, 'mirrored_static_downloads')
             mkdirp.sync grunt.config.get 'bender.build.mirrorArchiveDir'
 
