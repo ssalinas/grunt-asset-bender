@@ -191,13 +191,13 @@ exports.legacy_asset_bender_options =
             destDir: "/opt/cool/stuff/here"
             restrict: "there"
             tempDir: "/tmp/TEMP/no_really"
-            domain: "static2cdn.hubspot.com"
+            domain: "static.hsappstatic.net"
 
         test.expect 1
         test.deepEqual runner.buildOptionsArray(), [
             "-p", "/tmp/something/out/there", "-p", "/Users/rand-al-thor/the/DRAGON"
             "-b", "proj1:static-1.1", "-b", "proj2:static-3.256", "-b", "another_proj:static-11.17"
-            "--domain", "'static2cdn.hubspot.com'"
+            "--domain", "'static.hsappstatic.net'"
             "--mode", "compressed"
             "--target", "/opt/cool/stuff/here"
             "--restrict", "there"
@@ -211,12 +211,12 @@ exports.legacy_asset_bender_options =
             project: "/Users/rand-al-thor/the/DRAGON"
             destDir: "/opt/cool/stuff/here"
             restrict: "there"
-            domain: "static2cdn.hubspot.com"
+            domain: "static.hsappstatic.net"
 
         test.expect 1
         test.deepEqual runner.buildOptionsArray(), [
             "-p", "/Users/rand-al-thor/the/DRAGON"
-            "--domain", "'static2cdn.hubspot.com'"
+            "--domain", "'static.hsappstatic.net'"
             "--mode", "development"
             "--target", "/opt/cool/stuff/here"
             "--restrict", "there"

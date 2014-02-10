@@ -24,7 +24,7 @@ module.exports = (grunt) ->
         setRequiredBuildConfig 'bender.build.root', process.env.JENKINS_ROOT
         setRequiredBuildConfig 'bender.build.cacheDir', process.env.CACHE_DIR
         setRequiredBuildConfig 'bender.build.scmRev', process.env.GIT_COMMIT or process.env.SVN_REVISION
-        setRequiredBuildConfig 'bender.build.forcedDomain', process.env.FORCED_STATIC_DOMAIN or "static2cdn.hubspot.com"
+        setRequiredBuildConfig 'bender.build.forcedDomain', process.env.FORCED_STATIC_DOMAIN or "static.hsappstatic.net"
         setRequiredBuildConfig 'bender.assetCDNRegex', /\/\/static2cdn.hubspot.(com|net)\//
         setRequiredBuildConfig 'bender.assetBenderDir', process.env.HS_STATIC_REPO_DIR
 
