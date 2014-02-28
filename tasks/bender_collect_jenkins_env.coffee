@@ -141,5 +141,5 @@ module.exports = (grunt) ->
             grunt.config.set 'bender.build.isGNU', isGNU
 
             # Always log the name and version to build
-            grunt.log.writeln "Attempting to build #{projectConfig.name} #{grunt.config.get 'version'}...\n"
+            grunt.log.writeln "Attempting to build #{projectConfig.name} #{grunt.config.get('version') || ''}...\n"
             done()

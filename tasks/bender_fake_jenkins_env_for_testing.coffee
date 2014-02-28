@@ -63,14 +63,15 @@ module.exports = (grunt) ->
         job = path.basename(process.cwd())
 
         options = @options
-            jobName:          job
-            jenkinsRoot:      '/tmp/jenkins-root'
-            workspace:        process.cwd()
-            projectPath:      process.cwd()
-            hsStaticRepoDir:  utils.expandHomeDirectory('~/dev/src/hubspot_static_daemon')
-            cacheDir:         "/tmp/cache-dir/#{job}"
-            jenkinsTools:     utils.expandHomeDirectory('~/dev/src/JenkinsTools')
-            buildNumber:      '1'
+            jobName:            job
+            jenkinsRoot:        '/tmp/jenkins-root'
+            workspace:          process.cwd()
+            projectPath:        process.cwd()
+            hsStaticRepoDir:    utils.expandHomeDirectory('~/dev/src/hubspot_static_daemon')
+            cacheDir:           "/tmp/cache-dir/#{job}"
+            jenkinsTools:       utils.expandHomeDirectory('~/dev/src/JenkinsTools')
+            buildNumber:        '1'
+            ignoreBuildNumber:  true
 
             persistStaticCache: false
 
@@ -91,6 +92,8 @@ module.exports = (grunt) ->
 
         grunt.log.writeln "Faked jenkins environment:"
         grunt.log.writeln JSON.stringify(options, null, 2)
+
+        grunt.config.set 'bender.build.customLocalConfig', options
 
         loadUpEnv(options)
 
