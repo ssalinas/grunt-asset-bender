@@ -46,7 +46,7 @@ module.exports = (grunt) ->
 
         # Custom tmp directory for hs-static
         persistedCacheDir = "#{grunt.config.get 'bender.build.cacheDir'}/hs-static-tmp-persisted"
-        shouldPersistCache = utils.envVarEnabled('PERSIST_HS_STATIC_CACHE', false)
+        shouldPersistCache = utils.envVarEnabled('PERSIST_HS_STATIC_CACHE', true)
 
         if shouldPersistCache
             # If configured, keep the static cache between builds
