@@ -26,6 +26,12 @@ module.exports = (grunt) ->
         fromDir            = path.join outputDir, projectName, versionWithPrefix
         pythonModuleDir    = path.join originalProjectDir, projectName
 
+        ignoreBuildNumber  = grunt.config.get 'bender.build.customLocalConfig.ignoreBuildNumber'
+
+        if ignoreBuildNumber
+            grunt.log.writeln "Looks like a local build (since ignoreBuildNumber is set), skipping this task."
+            return
+
         if not fs.existsSync path.join(pythonModuleDir, '__init__.py')
             grunt.log.writeln "Warning, no such #{pythonModuleDir} module folder, looking for the first subdirectory with an __init__.py"
 
