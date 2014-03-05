@@ -2,6 +2,7 @@ _ = require 'underscore'
 Q = require 'q'
 path = require 'path'
 fs = require 'fs'
+mkdirp = require 'mkdirp'
 
 module.exports = (grunt) ->
     utils = require('../lib/utils').init(grunt)
@@ -27,6 +28,8 @@ module.exports = (grunt) ->
 
             # Ensure the same dep versions from update-deps are downloaded
             usePrebuilt: true
+
+        mkdirp.sync options.builtArchiveDir
 
         runner = new LegacyAssetBenderRunner _.extend options,
             command: 'download-built-deps'
