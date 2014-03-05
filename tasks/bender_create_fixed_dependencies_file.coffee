@@ -17,7 +17,7 @@ module.exports = (grunt) ->
         grunt.file.write outputPath, output
 
     writeFixedDepsFile = (outputPath) ->
-        output =
+        output = _.extend {}, grunt.config.get('bender.build.projectConfig'),
             name:  grunt.config.get 'bender.build.projectName'
             build: grunt.config.get 'bender.build.version'
             deps:  grunt.config.get 'bender.build.fixedProjectDeps'
