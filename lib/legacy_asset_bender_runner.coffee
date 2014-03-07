@@ -40,6 +40,9 @@ exports.init = (grunt) ->
             @headless = options.headless
             @usePrebuilt = options.usePrebuilt
             @debug = options.debug
+            @limitTo = options.limitTo
+            @ignore = options.ignore
+            @producdtion = options.producdtion
 
             # other (non-hs-static) options
             @envVars = options.envVars or {}
@@ -57,6 +60,18 @@ exports.init = (grunt) ->
         # is escaped for the command line
         domainOption: ->
             ['--domain', "'#{@domain}'"] if @domain?
+
+        limitToPathsOption: ->
+            if _.isArray @limitTo
+                ['--limit-to', @limitTo.join(',')]
+            else if _.isString @limitTo
+                ['--limit-to', @limitTo]
+
+        ignoredPathsOption: ->
+            if _.isArray @ignore
+                ['--ignored-paths', @ignore.join(',')]
+            else if _.isString @ignore
+                ['--ignored-paths', @ignore]
 
         projectOptions: ->
             if @projects? and @projects.length >= 0
@@ -78,9 +93,10 @@ exports.init = (grunt) ->
             globalAssetsDirOption:   "--global-assets-dir"
 
         basicFlagFunctions =
-            headlessFlag:         "--headless"
-            debugFlag:            "--debug"
-            usePrebuiltFlag:          "--use-prebuilt-static-conf"
+            headlessFlag:            "--headless"
+            debugFlag:               "--debug"
+            usePrebuiltFlag:         "--use-prebuilt-static-conf"
+            productionFlag:          "--production"
 
         for own funcName, flag of basicOptionFunctions
             do (funcName, flag) ->
@@ -99,6 +115,8 @@ exports.init = (grunt) ->
             bits.push @projectOptions()
             bits.push @buildVersionOptions()
             bits.push @domainOption()
+            bits.push @limitToPathsOption()
+            bits.push @ignoredPathsOption()
 
             for optionFunc, flag of basicOptionFunctions
                 bits.push @[optionFunc]()

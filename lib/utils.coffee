@@ -237,6 +237,16 @@ exports.init = (grunt) ->
 
         executeCommand(sedCmd)
 
+    hasJasmineSpecs = ->
+        projectDir = grunt.config.get 'bender.build.originalProjectDir'
+
+        hasSpecs = fs.existsSync path.join projectDir, '/static/test/specs.js'
+        hasSpecs = fs.existsSync path.join projectDir, '/static/test/specs.coffee' if not hasSpecs
+        hasSpecs
+
+    jasmineTestsEnabled = ->
+        envVarEnabled('RUN_JASMINE_TESTS', true)
+
 
     innerExports = {
         expandHomeDirectory
@@ -254,4 +264,6 @@ exports.init = (grunt) ->
         benderInfoForProject
         numCPUs
         findAndReplace
+        hasJasmineSpecs
+        jasmineTestsEnabled
     }

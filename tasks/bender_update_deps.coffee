@@ -32,6 +32,11 @@ module.exports = (grunt) ->
             mirrorArchiveDir: options.mirrorArchiveDir or grunt.config.get('bender.build.mirrorArchiveDir')
             fixedDepsPath: dependencyTreeOutputPath
 
+            # Treat any runtime deps as regular deps, so that they are downloaded
+            # and ready when test code is built and run (it is very likely that
+            # runtime deps are needed for the tests)
+            production: false
+
         stopwatch.start 'download_static_deps'
 
         runner.run().done ->
@@ -45,4 +50,4 @@ module.exports = (grunt) ->
             grunt.log.writeln "Done with downloading deps."
             done()
         , (message) ->
-            done new Error(message || "unkown error")
+            done new Error(message || "Unknown error")
