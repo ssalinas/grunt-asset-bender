@@ -64,7 +64,7 @@ module.exports = (grunt) ->
             domain: grunt.config.get 'bender.build.forcedDomain'
 
             # Don't include runtimeDeps
-            production: false
+            production: true
             ignore: [
                 "#{projectName}/static/test/*"
             ]
@@ -163,7 +163,6 @@ module.exports = (grunt) ->
 
             promises.push testPromise
 
-        console.log "promises", promises
 
         Q.all(promises).done ->
             grunt.config.set 'bender.build.modesBuilt', modesBuilt

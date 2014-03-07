@@ -42,7 +42,7 @@ exports.init = (grunt) ->
             @debug = options.debug
             @limitTo = options.limitTo
             @ignore = options.ignore
-            @producdtion = options.producdtion
+            @production = options.production
 
             # other (non-hs-static) options
             @envVars = options.envVars or {}
