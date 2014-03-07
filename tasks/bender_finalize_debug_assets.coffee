@@ -37,7 +37,7 @@ module.exports = (grunt) ->
                 sourceDirectory: path.join(outputDir, projectName, versionWithPrefix)
                 filesToReplace: "*.bundle-expanded.html"
                 useExtendedRegex: true
-                commands: "\"s/#{string1}/#{string2}/g\""
+                commands: "\"s/\\<#{string1}/#{string2}/g\""
             .fail ->
                 grunt.log.writeln "Error munging build names from \"/static/\" to \'#{versionWithPrefix}\". Continuing..."
 
@@ -49,7 +49,7 @@ module.exports = (grunt) ->
                 sourceDirectory: path.join(outputDir, projectName, "#{versionWithPrefix}-debug")
                 filesToReplace: "*.html"
                 useExtendedRegex: true
-                commands: "\"s/#{string1}/#{string2}/g\""
+                commands: "\"s/\\<#{string1}/#{string2}/g\""
             .fail ->
                 grunt.log.writeln "Error munging build names from \"/static/\" to \'#{versionWithPrefix}\" in compiled debug templates. Continuing..."
 

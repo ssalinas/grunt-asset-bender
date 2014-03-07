@@ -229,6 +229,10 @@ exports.init = (grunt) ->
             parts.push '-r'
 
         for command in commands
+            # Macs also do word-breaks differently
+            if not grunt.config.get('bender.build.isGNU')
+                command = command.replace '\\<', '[[:<:]]'
+
             parts.push '-e', command
 
         # Yeah, joining and execing a whole string is gross... (too lazy right now

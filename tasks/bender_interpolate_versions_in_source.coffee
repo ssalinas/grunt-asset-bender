@@ -43,7 +43,7 @@ module.exports = (grunt) ->
 
                     utils.findAndReplace
                         sourceDirectory: path.join projectDir, versionWithPrefix
-                        commands: "'s/#{string1}/#{string2}/g'"
+                        commands: "'s/\\<#{string1}/#{string2}/g'"
                     .fail (err) ->
                         grunt.fail.warn "Error munging build names for #{depName} to #{depVersion}: #{err}"
 
