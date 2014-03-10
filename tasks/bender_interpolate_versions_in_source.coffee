@@ -50,7 +50,8 @@ module.exports = (grunt) ->
         # Run the sed tasks sequentially
         if sedTasks
             firstTask = sedTasks.shift()
-            result = Q(firstTask)
+            result = Q firstTask()
+            sedPromises.push result
 
             sedTasks.forEach (task) ->
                 result = result.then(task);
