@@ -239,6 +239,7 @@ exports.init = (grunt) ->
         # to re-do the escaping on all the uses of this command)
         sedCmd = parts.join ' '
 
+        grunt.verbose.writeln "Running: #{sedCmd}"
         executeCommand(sedCmd)
 
 
