@@ -46,10 +46,10 @@ module.exports = (grunt) ->
 
         modesBuilt = []
         promises = []
+        debugBuildPromise = null
 
         # The debug compilation process
         debugOptions = _.extend {}, options,
-            bufferOutput: true
             project: options.project
             mode: 'development'
             restrict: projectName
@@ -61,25 +61,39 @@ module.exports = (grunt) ->
             globalAssetsDir: path.join(grunt.config.get('bender.build.tempDir'), 'hs-static-global')
             domain: grunt.config.get 'bender.build.forcedDomain'
 
-        do (debugOptions) ->
-            debugRunner = new LegacyAssetBenderRunner debugOptions
-            stopwatch.start 'precompile_debug_assets'
+            # By default, stream out the debug build and buffer the compressed build
+            # output for later
+            bufferOutput: false
 
-            promises.push debugRunner.run().then (result) ->
-                stopwatch.stop 'precompile_debug_assets'
+        grunt.log.writeln ""
 
-                grunt.log.writeln "\nDebug output\n============"
-                grunt.log.writeln result.stdoutAndStderr
-                grunt.log.writeln "== End debug output"
+        if options.skipDebugBuild is true
+            grunt.log.writeln "Skipping compressed build due to skipDebugBuild"
+            debugBuildPromise = Q()
+        else
+            do (debugOptions) ->
+                debugRunner = new LegacyAssetBenderRunner debugOptions
+                stopwatch.start 'precompile_debug_assets'
 
-                modesBuilt.push debugOptions.mode
-                grunt.config.set "bender.build.#{debugOptions.mode}.outputDir", debugOptions.destDir
-                grunt.config.set "bender.build.#{debugOptions.mode}.buildMD5Hash", getBuildHash(projectName, version, debugOptions.destDir)
+                promises.push debugBuildPromise = debugRunner.run().then (result) ->
+                    stopwatch.stop 'precompile_debug_assets'
 
-            , (result) ->
-                grunt.log.writeln "\nFailed debug output (code: #{result.code})\n=================="
-                grunt.log.writeln result.stdoutAndStderr
-                grunt.fail.warn 'Debug compile process failed'
+                    if debugOptions.bufferOutput is true
+                        grunt.log.writeln "\nDebug output\n============"
+                        grunt.log.writeln result.stdoutAndStderr
+                        grunt.log.writeln "== End debug output"
+
+                    modesBuilt.push debugOptions.mode
+                    grunt.config.set "bender.build.#{debugOptions.mode}.outputDir", debugOptions.destDir
+                    grunt.config.set "bender.build.#{debugOptions.mode}.buildMD5Hash", getBuildHash(projectName, version, debugOptions.destDir)
+
+                , (result) ->
+                    if debugOptions.bufferOutput is true
+                        grunt.log.writeln "\nFailed debug output (code: #{result.code})\n=================="
+                        grunt.log.writeln result.stdoutAndStderr
+
+                    grunt.fail.warn 'Debug compile process failed'
+
 
         # The compressed compilation process
         compressedOptions = _.extend {}, debugOptions,
@@ -90,27 +104,48 @@ module.exports = (grunt) ->
             tempDir: grunt.config.get('bender.build.sprocketsCacheDir')
             destDir: options.destDir
 
-        do (compressedOptions) ->
-            compressedRunner = new LegacyAssetBenderRunner compressedOptions
-            stopwatch.start 'precompile_compressed_assets'
+            # Only stream out the compressed output if there isn't a debug build
+            bufferOutput: not options.skipDebugBuild
 
-            promises.push compressedRunner.run().then (result) ->
-                stopwatch.stop 'precompile_compressed_assets'
+        grunt.log.writeln ""
 
-                grunt.log.writeln "\nCompressed output\n================="
-                grunt.log.writeln result.stdoutAndStderr
-                grunt.log.writeln "== End compressed output"
+        if options.skipCompressedBuild is true
+            grunt.log.writeln "\nSkipping compressed build due to skipCompressedBuild"
+        else
+            do (compressedOptions) ->
+                compressedRunner = new LegacyAssetBenderRunner compressedOptions
+                stopwatch.start 'precompile_compressed_assets'
 
-                modesBuilt.push compressedOptions.mode
-                grunt.config.set "bender.build.#{compressedOptions.mode}.outputDir", compressedOptions.destDir
-                grunt.config.set "bender.build.#{compressedOptions.mode}.buildMD5Hash", getBuildHash(projectName, version, compressedOptions.destDir)
+                promises.push compressedRunner.run().then (result) ->
+                    stopwatchOut = stopwatch.stopButDontPrint 'precompile_compressed_assets'
 
-            , (result) ->
-                grunt.log.writeln "\nFailed compressed output (code: #{result.code})\n======================="
-                grunt.log.writeln result.stdoutAndStderr
-                grunt.fail.warn 'Compressed compile process failed'
+                    # Wait to print anything until debug is done
+                    debugBuildPromise.finally ->
+                        if compressedOptions.bufferOutput is true
+                            grunt.log.writeln "\nCompressed output\n================="
+                            grunt.log.writeln result.stdoutAndStderr
+                            grunt.log.writeln "== End compressed output"
+
+                        grunt.log.writeln stopwatchOut
+
+                        modesBuilt.push compressedOptions.mode
+                        grunt.config.set "bender.build.#{compressedOptions.mode}.outputDir", compressedOptions.destDir
+                        grunt.config.set "bender.build.#{compressedOptions.mode}.buildMD5Hash", getBuildHash(projectName, version, compressedOptions.destDir)
+
+                , (result) ->
+                    # Wait to print anything until debug is done
+                    debugBuildPromise.finally ->
+                        if compressedOptions.bufferOutput is true
+                            grunt.log.writeln "\nFailed compressed output (code: #{result.code})\n======================="
+                            grunt.log.writeln result.stdoutAndStderr
+
+                        grunt.fail.warn 'Compressed compile process failed'
 
 
+        if debugOptions.bufferOutput is false and not options.skipDebugBuild
+            grunt.log.writeln "\nStreaming debug output\n======================"
+        else if compressedOptions.bufferOutput is false and not options.skipCompressedBuild
+            grunt.log.writeln "\nStreaming compressed output\n==========================="
 
         Q.all(promises).done ->
             grunt.config.set 'bender.build.modesBuilt', modesBuilt

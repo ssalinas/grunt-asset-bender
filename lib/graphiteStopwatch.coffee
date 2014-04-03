@@ -30,11 +30,15 @@ class GraphiteStopwatch
     @_write metrics
     delete @start_times[name]
 
-    console.log "Stopped graphite '#{name}' timer: #{durationInSeconds}"
     durationInSeconds
 
   stop: (name) ->
-    @_stop(name)
+    duration = @_stop(name)
+    console.log "Stopped graphite '#{name}' timer: #{duration}"
+
+  stopButDontPrint: (name) ->
+    duration = @_stop(name)
+    "Stopped graphite '#{name}' timer: #{duration}"
 
   _write: (metrics) ->
     @client.write metrics
@@ -56,17 +60,23 @@ class DualGraphiteStopwatch extends GraphiteStopwatch
       yielded_value
 
   stop: (name) ->
-    @_stop name
-    @_stop @secondaryPrefix + name
+    duration1 = @_stop name
+    duration2 = @_stop @secondaryPrefix + name
+    console.log "Stopped graphite '#{name}' timer: #{duration1}"
+    console.log "Stopped graphite '#{@secondaryPrefix + name}' timer: #{duration2}"
 
+  stopButDontPrint: (name) ->
+    duration1 = @_stop name
+    duration2 = @_stop @secondaryPrefix + name
+    "Stopped graphite '#{name}' timer: #{duration1}\nStopped graphite '#{@secondaryPrefix + name}' timer: #{duration2}"
 
 class FauxGraphiteStopwatch extends GraphiteStopwatch
   constructor: ->
     super('', null)
 
   _write: (metrics) ->
-    for own name, duration of metrics
-      console.log "#{name} took: #{duration}s"
+    # for own name, duration of metrics
+    #   console.log "#{name} took: #{duration}s"
 
 
 module.exports = { GraphiteStopwatch, DualGraphiteStopwatch, FauxGraphiteStopwatch }

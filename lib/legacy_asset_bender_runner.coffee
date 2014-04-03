@@ -133,9 +133,11 @@ exports.init = (grunt) ->
             deferred = Q.defer()
             grunt.log.writeln "Running: ", @buildFullCommandString()
 
-            compileProc = spawn @executable, [@command].concat(@buildOptionsArray()),
-                env: _.extend process.env, @envVars
+            runOptions =
+                env: _.extend(process.env, @envVars)
                 cwd: @path
+
+            compileProc = spawn @executable, [@command].concat(@buildOptionsArray()), runOptions
 
             if @bufferOutput
                 stdoutChunks = []
