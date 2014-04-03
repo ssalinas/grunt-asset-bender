@@ -74,75 +74,87 @@ module.exports = (grunt) ->
         setRequiredBuildConfig 'bender.build.projectName', projectConfig.name
 
 
-        # Move the source that will be messed with to a temp location (so we don't goof up the repo when modifying it)
-        sourceDir = path.join tempDir, 'src'
-        grunt.config.set 'bender.build.sourceDir', sourceDir
+        # Move the source that will be messed with to a temp location (so we don't
+        # goof up the repo when modifying it). And unfortunately, we need a copy
+        # for both the regular and compressed builds because temporary files created
+        # during the build (like *.genhtml) can cause race conditions and incorrect behavior.
 
-        copiedProjectDir = path.join sourceDir, projectConfig.name
+        copiedProjectDir = path.join tempDir, 'src', projectConfig.name
+        copiedProjectDirForCompressedBuild = path.join tempDir, "src-for-compressed", projectConfig.name
+
         grunt.config.set 'bender.build.copiedProjectDir', copiedProjectDir
+        grunt.config.set 'bender.build.copiedProjectDirForCompressedBuild', copiedProjectDirForCompressedBuild
 
         mkdirp.sync copiedProjectDir
-        wrench.copyDirSyncRecursive path.join(origProjectDir, 'static'), path.join(copiedProjectDir, 'static'),
-            excludeHiddenUnix: true     # .DS_Store files gunk up the sed replacements that happen later
+        mkdirp.sync copiedProjectDirForCompressedBuild
+
+        copyOptions =
+            # .DS_Store files gunk up the sed replacements that happen later
+            excludeHiddenUnix: true
+
+        # Execute both copies is parallel
+        Q.all([
+            Q.nfcall(wrench.copyDirRecursive, path.join(origProjectDir, 'static'), path.join(copiedProjectDir, 'static'), copyOptions)
+            Q.nfcall(wrench.copyDirRecursive, path.join(origProjectDir, 'static'), path.join(copiedProjectDirForCompressedBuild, 'static'), copyOptions)
+        ]).done ->
+
+            # Mirror archive directory
+            if utils.envVarEnabled('USE_LOCAL_ARCHIVE_MIRROR', true)
+                # Just use temp for now since the cacheDir isn't yet saved between builds
+                mirrorParentDir = '/tmp'
+                # mirrorParentDir = grunt.config.get('bender.build.cacheDir') or '/tmp'
+
+                grunt.config.set 'bender.build.mirrorArchiveDir', path.join(mirrorParentDir, 'mirrored_static_downloads')
+                mkdirp.sync grunt.config.get 'bender.build.mirrorArchiveDir'
 
 
-        # Mirror archive directory
-        if utils.envVarEnabled('USE_LOCAL_ARCHIVE_MIRROR', true)
-            # Just use temp for now since the cacheDir isn't yet saved between builds
-            mirrorParentDir = '/tmp'
-            # mirrorParentDir = grunt.config.get('bender.build.cacheDir') or '/tmp'
+            # Version
+            forcedMajorVersion = parseInt(process.env.FORCED_MAJOR_VERSION, 10) if process.env.FORCED_MAJOR_VERSION?
+            majorVersion = forcedMajorVersion or projectConfig.majorVersion or 1
+            minorVersion = grunt.config.get('bender.build.jobNumber')
+            isCurrentVersion = projectConfig.isCurrentVersion
 
-            grunt.config.set 'bender.build.mirrorArchiveDir', path.join(mirrorParentDir, 'mirrored_static_downloads')
-            mkdirp.sync grunt.config.get 'bender.build.mirrorArchiveDir'
+            # Legacy "is current" check
+            if process.env.CURRENT_STATIC_VERSION?
+                isCurrentVersion = majorVersion == parseInt(process.env.CURRENT_STATIC_VERSION, 10)
 
+            # By default, assume isCurrentVersion anything majorVersion == 1
+            else if majorVersion == 1 and not isCurrentVersion?
+                isCurrentVersion = true
 
-        # Version
-        forcedMajorVersion = parseInt(process.env.FORCED_MAJOR_VERSION, 10) if process.env.FORCED_MAJOR_VERSION?
-        majorVersion = forcedMajorVersion or projectConfig.majorVersion or 1
-        minorVersion = grunt.config.get('bender.build.jobNumber')
-        isCurrentVersion = projectConfig.isCurrentVersion
+            # Otherwise, set isCurrentVersion for any other major version (unless it is explicitly set)
+            else if not isCurrentVersion?
+                isCurrentVersion = false
 
-        # Legacy "is current" check
-        if process.env.CURRENT_STATIC_VERSION?
-            isCurrentVersion = majorVersion == parseInt(process.env.CURRENT_STATIC_VERSION, 10)
+            setRequiredBuildConfig 'bender.build.isCurrentVersion', isCurrentVersion
+            setRequiredBuildConfig 'bender.build.majorVersion', majorVersion
+            setRequiredBuildConfig 'bender.build.minorVersion', minorVersion
+            setRequiredBuildConfig 'bender.build.version', "#{majorVersion}.#{minorVersion}"
+            setRequiredBuildConfig 'bender.build.versionWithStaticPrefix', "static-#{majorVersion}.#{minorVersion}"
 
-        # By default, assume isCurrentVersion anything majorVersion == 1
-        else if majorVersion == 1 and not isCurrentVersion?
-            isCurrentVersion = true
+            # Graphite client for other tasks to use
+            grunt.config.set 'bender.graphite.server', process.env.GRAPHITE_SERVER
+            grunt.config.set 'bender.graphite.port', process.env.GRAPHITE_PORT
+            grunt.config.set 'bender.graphite.namespace', process.env.GRAPHITE_NAMESPACE
 
-        # Otherwise, set isCurrentVersion for any other major version (unless it is explicitly set)
-        else if not isCurrentVersion?
-            isCurrentVersion = false
-
-        setRequiredBuildConfig 'bender.build.isCurrentVersion', isCurrentVersion
-        setRequiredBuildConfig 'bender.build.majorVersion', majorVersion
-        setRequiredBuildConfig 'bender.build.minorVersion', minorVersion
-        setRequiredBuildConfig 'bender.build.version', "#{majorVersion}.#{minorVersion}"
-        setRequiredBuildConfig 'bender.build.versionWithStaticPrefix', "static-#{majorVersion}.#{minorVersion}"
-
-        # Graphite client for other tasks to use
-        grunt.config.set 'bender.graphite.server', process.env.GRAPHITE_SERVER
-        grunt.config.set 'bender.graphite.port', process.env.GRAPHITE_PORT
-        grunt.config.set 'bender.graphite.namespace', process.env.GRAPHITE_NAMESPACE
-
-        grunt.log.writeln "process.env.GRAPHITE_SERVER", process.env.GRAPHITE_SERVER
-        grunt.log.writeln "process.env.GRAPHITE_PORT", process.env.GRAPHITE_PORT
-        grunt.log.writeln "process.env.GRAPHITE_NAMESPACE", process.env.GRAPHITE_NAMESPACE
+            grunt.log.writeln "process.env.GRAPHITE_SERVER", process.env.GRAPHITE_SERVER
+            grunt.log.writeln "process.env.GRAPHITE_PORT", process.env.GRAPHITE_PORT
+            grunt.log.writeln "process.env.GRAPHITE_NAMESPACE", process.env.GRAPHITE_NAMESPACE
 
 
-        # Output all build config when --verbose
-        grunt.verbose.writeln "Current build config:"
-        formattedConfig = JSON.stringify grunt.config.get('bender'), null, 2
-        formattedConfig = formattedConfig.replace '\n', '\n  '
-        grunt.verbose.writeln formattedConfig
+            # Output all build config when --verbose
+            grunt.verbose.writeln "Current build config:"
+            formattedConfig = JSON.stringify grunt.config.get('bender'), null, 2
+            formattedConfig = formattedConfig.replace '\n', '\n  '
+            grunt.verbose.writeln formattedConfig
 
 
-        utils.graphiteStopwatch(grunt).start('total_build_duration')
+            utils.graphiteStopwatch(grunt).start('total_build_duration')
 
-        # Store whether the command line tools are GNU-style for future tasks
-        utils.isGNU().done (isGNU) ->
-            grunt.config.set 'bender.build.isGNU', isGNU
+            # Store whether the command line tools are GNU-style for future tasks
+            utils.isGNU().done (isGNU) ->
+                grunt.config.set 'bender.build.isGNU', isGNU
 
-            # Always log the name and version to build
-            grunt.log.writeln "Attempting to build #{projectConfig.name} #{grunt.config.get('version') || ''}...\n"
-            done()
+                # Always log the name and version to build
+                grunt.log.writeln "Attempting to build #{projectConfig.name} #{grunt.config.get('version') || ''}...\n"
+                done()

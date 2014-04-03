@@ -83,6 +83,7 @@ module.exports = (grunt) ->
 
         # The compressed compilation process
         compressedOptions = _.extend {}, debugOptions,
+            project: grunt.config.get('bender.build.copiedProjectDirForCompressedBuild') or process.cwd()
             mode: "compressed"
             command: 'precompile'
             buildVersions: buildVersions
