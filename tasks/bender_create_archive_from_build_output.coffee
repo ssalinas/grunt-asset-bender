@@ -10,13 +10,11 @@ module.exports = (grunt) ->
         done = @async()
 
         grunt.config.requires 'bender.build.projectName',
-                              'bender.build.copiedProjectDir',
                               'bender.build.versionWithStaticPrefix',
                               'bender.build.fixedProjectDeps'
 
         outputDir          = utils.preferredOutputDir(grunt)
         projectName        = grunt.config.get 'bender.build.projectName'
-        projectDir         = grunt.config.get 'bender.build.copiedProjectDir'
         versionWithPrefix  = grunt.config.get 'bender.build.versionWithStaticPrefix'
 
 
