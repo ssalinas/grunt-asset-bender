@@ -28,10 +28,6 @@ module.exports = (grunt) ->
 
         ignoreBuildNumber  = grunt.config.get 'bender.build.customLocalConfig.ignoreBuildNumber'
 
-        if ignoreBuildNumber
-            grunt.log.writeln "Looks like a local build (since ignoreBuildNumber is set), skipping this task."
-            return
-
         if not fs.existsSync path.join(pythonModuleDir, '__init__.py')
             grunt.log.writeln "Warning, no such #{pythonModuleDir} module folder, looking for the first subdirectory with an __init__.py"
 
@@ -44,12 +40,30 @@ module.exports = (grunt) ->
 
             pythonModuleDir = allPythonDirs[0]
 
-        if pythonModuleDir
+        if pythonModuleDir and ignoreBuildNumber
+            grunt.log.writeln "Looks like a local build (since ignoreBuildNumber is set), skipping this task. But it would have..."
+
+            copyFromToPaths = [
+                [path.join(fromDir, 'info.txt'), path.join(pythonModuleDir, 'static', 'info.txt')],
+                [path.join(fromDir, 'static_conf.json'), path.join(pythonModuleDir, 'static', 'static_conf.json')],
+                [path.join(fromDir, 'prebuilt_recursive_static_conf.json'), path.join(pythonModuleDir, 'static', 'prebuilt_recursive_static_conf.json')]
+            ]
+
+            for paths in copyFromToPaths
+                [from, to] = paths
+
+                if grunt.file.exists from
+                    grunt.log.writeln "  Copied: #{from}  to  #{to}"
+                else
+                    grunt.fail.warn "  Couldn't copy: #{from} doesn't exist!"
+
+        else if pythonModuleDir
             grunt.log.writeln "Copying static_conf.json and prebuilt_recursive_static_conf.json from #{fromDir} to #{pythonModuleDir}/static/ (so it will work via egg/venv install)"
 
             mkdirp.sync path.join pythonModuleDir, 'static'
             utils.copyFileSync path.join(fromDir, 'info.txt'),  path.join(pythonModuleDir, 'static', 'info.txt')
             utils.copyFileSync path.join(fromDir, 'static_conf.json'),  path.join(pythonModuleDir, 'static', 'static_conf.json')
             utils.copyFileSync path.join(fromDir, 'prebuilt_recursive_static_conf.json'),  path.join(pythonModuleDir, 'static', 'prebuilt_recursive_static_conf.json')
+
         else
             grunt.log.writeln "Assuming this is not a python/django project, no module folder could be found."
