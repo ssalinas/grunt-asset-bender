@@ -251,6 +251,18 @@ exports.init = (grunt) ->
     jasmineTestsEnabled = ->
         envVarEnabled('RUN_JASMINE_TESTS', true)
 
+    hasDevOrRuntimeDeps = ->
+        projectConfig = grunt.config.get 'bender.build.projectConfig'
+
+        # Fortunately, loadBenderProjectConfig has already converted underscores
+        # to camelcase for us.
+        projectConfig.runtimeDeps?.length > 0 or projectConfig.devDeps?.length
+
+    # Since tests need the runtime & dev deps included, we will do a separate
+    # test compile pass when a project has any runtime or dev dependencies
+    needsToBuildTestsSeparately = ->
+        utils.hasJasmineSpecs() and utils.jasmineTestsEnabled() and utils.hasDevOrRuntimeDeps()
+
 
     innerExports = {
         expandHomeDirectory

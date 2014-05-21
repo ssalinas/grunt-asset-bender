@@ -47,6 +47,7 @@ module.exports = (grunt) ->
         modesBuilt = []
         promises = []
         debugBuildPromise = null
+        compressedBuildPromise = null
 
         # The debug compilation process
         debugOptions = _.extend {}, options,
@@ -64,6 +65,14 @@ module.exports = (grunt) ->
             # By default, stream out the debug build and buffer the compressed build
             # output for later
             bufferOutput: false
+
+        # If this is a project using devDeps/runtimeDeps, don't include them in the debug build
+        if utils.hasDevOrRuntimeDeps()
+            _.extend debugOptions,
+                production: true
+                ignore: [
+                    "#{projectName}/static/test/*"
+                ]
 
         grunt.log.writeln ""
 
@@ -111,12 +120,13 @@ module.exports = (grunt) ->
 
         if options.skipCompressedBuild is true
             grunt.log.writeln "\nSkipping compressed build due to skipCompressedBuild"
+            compressedBuildPromise = Q()
         else
             do (compressedOptions) ->
                 compressedRunner = new LegacyAssetBenderRunner compressedOptions
                 stopwatch.start 'precompile_compressed_assets'
 
-                promises.push compressedRunner.run().then (result) ->
+                promises.push compressedBuildPromise = compressedRunner.run().then (result) ->
                     stopwatchOut = stopwatch.stopButDontPrint 'precompile_compressed_assets'
 
                     # Wait to print anything until debug is done
@@ -140,6 +150,49 @@ module.exports = (grunt) ->
                             grunt.log.writeln result.stdoutAndStderr
 
                         grunt.fail.warn 'Compressed compile process failed'
+
+
+        # Since tests need the runtime & dev deps included, we will do a separate
+        # test compile pass when a project has any runtime or dev dependencies
+        #
+        # This test compile pass is run serially after the main compressed build
+        # finishes (but still in parallel with the debug build), so we can share
+        # the compressed build's cache.
+        if utils.needsToBuildTestsSeparately()
+
+            testPromise = compressedBuildPromise.then ->
+                testOptions = _.extend {}, compressedOptions,
+                    command: 'precompile_without_bundle_html'
+                    destDir: "#{options.destDir}-test"
+
+                    # *Only* bulid things in the test folder
+                    ignore: []
+                    limitTo: [
+                        "#{projectName}/static/test/*"
+                    ]
+
+                    # Treat any runtime deps that are needed to build/run
+                    # the tests to regular deps.
+                    production: false
+
+                testRunner = new LegacyAssetBenderRunner testOptions
+                stopwatch.start 'precompile_test_assets'
+
+                testRunner.run().then (result) ->
+                    stopwatch.stop 'precompile_test_assets'
+
+                    grunt.log.writeln "\nTest output\n===========\n"
+                    grunt.log.writeln result.stdoutAndStderr
+                    grunt.log.writeln "== End test output"
+
+                    grunt.config.set "bender.build.test.outputDir", testOptions.destDir
+
+                , (result) ->
+                    grunt.log.writeln "\nFailed test build output (code: #{result.code})\n=======================\n"
+                    grunt.log.writeln result.stdoutAndStderr
+                    grunt.fail.warn 'Test compile process failed'
+
+            promises.push testPromise
 
 
         if debugOptions.bufferOutput is false and not options.skipDebugBuild
