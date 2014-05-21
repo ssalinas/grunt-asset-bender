@@ -19,11 +19,9 @@ module.exports = (grunt) ->
 
         grunt.config.requires 'bender.build.projectName',
                               'bender.build.majorVersion',
-                              'bender.build.copiedProjectDir'
 
         projectName  = grunt.config.get 'bender.build.projectName'
         majorVersion = grunt.config.get 'bender.build.majorVersion'
-        projectDir   = grunt.config.get 'bender.build.copiedProjectDir'
 
         hasIsFrom = utils.preferredModeBuilt()
         currentMD5Hash = grunt.config.get 'bender.build.#{hashIsFrom}.buildMD5Hash'

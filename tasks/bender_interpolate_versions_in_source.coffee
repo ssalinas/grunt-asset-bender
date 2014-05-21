@@ -43,14 +43,15 @@ module.exports = (grunt) ->
 
                     utils.findAndReplace
                         sourceDirectory: path.join projectDir, versionWithPrefix
-                        commands: "'s/#{string1}/#{string2}/g'"
+                        commands: "'s/\\<#{string1}/#{string2}/g'"
                     .fail (err) ->
                         grunt.fail.warn "Error munging build names for #{depName} to #{depVersion}: #{err}"
 
         # Run the sed tasks sequentially
         if sedTasks
             firstTask = sedTasks.shift()
-            result = Q(firstTask)
+            result = Q firstTask()
+            sedPromises.push result
 
             sedTasks.forEach (task) ->
                 result = result.then(task);

@@ -73,7 +73,7 @@ module.exports = (grunt) ->
             buildNumber:        '1'
             ignoreBuildNumber:  true
 
-            persistStaticCache: true
+            persistStaticCache: false
 
             pythonBin:               '/usr/bin/python'
             staticDeployPython:      '/usr/bin/python'
