@@ -261,7 +261,7 @@ exports.init = (grunt) ->
     # Since tests need the runtime & dev deps included, we will do a separate
     # test compile pass when a project has any runtime or dev dependencies
     needsToBuildTestsSeparately = ->
-        utils.hasJasmineSpecs() and utils.jasmineTestsEnabled() and utils.hasDevOrRuntimeDeps()
+        hasJasmineSpecs() and jasmineTestsEnabled() and hasDevOrRuntimeDeps()
 
 
     innerExports = {
@@ -282,4 +282,6 @@ exports.init = (grunt) ->
         findAndReplace
         hasJasmineSpecs
         jasmineTestsEnabled
+        hasDevOrRuntimeDeps
+        needsToBuildTestsSeparately
     }

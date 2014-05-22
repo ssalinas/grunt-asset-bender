@@ -202,6 +202,12 @@ module.exports = (grunt) ->
 
         Q.all(promises).done ->
             grunt.config.set 'bender.build.modesBuilt', modesBuilt
+
+            # Make sure that test dir is set even if there wasn't a separate test
+            # compile pass
+            if not grunt.config.get("bender.build.test.outputDir")?
+                grunt.config.set "bender.build.test.outputDir", utils.preferredOutputDir(grunt)
+
             grunt.log.writeln "Done with build."
             done()
         , (message) ->

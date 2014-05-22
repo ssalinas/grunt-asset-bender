@@ -17,14 +17,8 @@ module.exports = (grunt) ->
                               'bender.build.test.outputDir'
 
         projectDir = grunt.config.get 'bender.build.copiedProjectDir'
+        outputDir = grunt.config.get('bender.build.test.outputDir')
         stopwatch  = utils.graphiteStopwatch(grunt)
-
-        # The tests are compiled in a separate pass to a different directory
-        # if there were any runtime or dev dependencies
-        if utils.needsToBuildTestsSeparately()
-            outputDir = grunt.config.get('bender.build.test.outputDir')
-        else
-            outputDir = utils.preferredOutputDir(grunt)
 
         hasSpecs = utils.hasJasmineSpecs()
         jasmineTestsEnabled = utils.jasmineTestsEnabled()
