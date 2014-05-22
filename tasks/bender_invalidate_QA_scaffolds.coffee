@@ -16,8 +16,11 @@ module.exports = (grunt) ->
         projectName      = grunt.config.get 'bender.build.projectName'
         stopwatch        = utils.graphiteStopwatch(grunt)
 
+
         if utils.envVarEnabled('SKIP_STATIC_QA_DEPLOY', false)
-            grunt.log.writeln "Skipping QA static deploy"
+            grunt.log.writeln "Skipping QA static deploy, SKIP_STATIC_QA_DEPLOY is set"
+        else if grunt.config.get('bender.build.skipUpload')
+            grunt.log.writeln "Skipping QA static deploy, SKIP_STATIC_UPLOAD or bender.build.skipUpload is set"
         else
             grunt.log.writeln "Invalidating QA scaffolds (so that QA gets the latest code immediately)..."
 
