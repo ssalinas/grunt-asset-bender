@@ -10,8 +10,12 @@ module.exports = (grunt) ->
         done = @async()
 
         ignoreBuildNumber = grunt.config.get 'bender.build.customLocalConfig.ignoreBuildNumber'
+        skipUpload        = grunt.config.get 'bender.build.skipUpload'
 
-        if ignoreBuildNumber
+        if skipUpload
+            grunt.log.writeln "SKIP_STATIC_UPLOAD or bender.build.skipUpload set, not uploading anything to S3"
+            done()
+        else if ignoreBuildNumber
             grunt.fail.warn "This is a locally run build, are you sure that you want to upload build results to s3?\nIf you really want to (let's say, a jenkins emergency), you must manually set ignoreBuildNumber to false and specify a buildNumber inside the 'bender_fake_jenkins_env_for_testing' options in your gruntfile.\n"
             done()
         else

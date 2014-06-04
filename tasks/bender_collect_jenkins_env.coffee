@@ -34,6 +34,10 @@ module.exports = (grunt) ->
         # Backward compatibility stuff to remove..
         process.env.COMPILE_JADE = '1' unless process.env.COMPILE_JADE?  # (Can be removed after build.hubteam.com is decommisioned)
 
+        # Non-required settings
+        grunt.config.set 'bender.build.skipUpload', utils.envVarEnabled('SKIP_STATIC_UPLOAD', false)
+
+        console.log "grunt.config.get('bender.build.skipUpload')", grunt.config.get('bender.build.skipUpload')
 
         # Tempory directories
         setRequiredBuildConfig 'bender.build.tempDir', path.join(process.env.CACHE_DIR or process.env.WORKSPACE, 'temp-for-static')
