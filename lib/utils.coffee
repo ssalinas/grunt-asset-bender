@@ -256,7 +256,13 @@ exports.init = (grunt) ->
 
         # Fortunately, loadBenderProjectConfig has already converted underscores
         # to camelcase for us.
-        projectConfig.runtimeDeps?.length > 0 or projectConfig.devDeps?.length
+        runtimeDeps = projectConfig.runtimeDeps
+        devDeps = projectConfig.devDeps
+
+        hasAnyRuntimeDeps = runtimeDeps? and Object.keys(runtimeDeps).length > 0
+        hasAnyDevDeps = devDeps? and Object.keys(devDeps).length > 0
+
+        hasAnyDevDeps or hasAnyRuntimeDeps
 
     # Since tests need the runtime & dev deps included, we will do a separate
     # test compile pass when a project has any runtime or dev dependencies

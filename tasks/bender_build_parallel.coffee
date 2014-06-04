@@ -165,7 +165,7 @@ module.exports = (grunt) ->
                     command: 'precompile_without_bundle_html'
                     destDir: "#{options.destDir}-test"
 
-                    # *Only* bulid things in the test folder
+                    # *Only* build things in the test folder
                     ignore: []
                     limitTo: [
                         "#{projectName}/static/test/*"
