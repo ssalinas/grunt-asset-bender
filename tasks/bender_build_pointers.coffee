@@ -77,13 +77,13 @@ module.exports = (grunt) ->
             promises = []
 
             # If this is the first time this major version has been built, create the prod pointer(s) as well
-            promises.push fetchLatestVersionOfProject(projectName, majorVersion, { forceProduction: true }).fail ->
+            promises.push fetchLatestVersionOfProject(projectName, majorVersion, { forceProduction: true, cdn: false, env: 'prod' }).fail ->
                 grunt.log.writeln "This is the first time building major version #{majorVersion}, creating the prod latest-version-#{majorVersion} pointer"
                 writePointerToAll versionWithPrefix, "latest-version-#{majorVersion}"
 
             # If this is major version one and there is no existing "prod" current pointer, create it
             if majorVersion == 1
-                promises.push fetchLatestVersionOfProject(projectName, 'current', { forceProduction: true }).fail ->
+                promises.push fetchLatestVersionOfProject(projectName, 'current', { forceProduction: true, cdn: false, env: 'prod' }).fail ->
                     grunt.log.writeln "Also building the product current pointer for the first time"
                     writePointerToAll versionWithPrefix, "current"
 
