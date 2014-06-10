@@ -74,18 +74,21 @@ module.exports = (grunt) ->
             else
                 grunt.log.writeln "Skipping the 'current-qa' pointer since this is not a \"current\" build."
 
+            promises = []
+
             # If this is the first time this major version has been built, create the prod pointer(s) as well
-            fetchLatestVersionOfProject(projectName, majorVersion).fail ->
+            promises.push fetchLatestVersionOfProject(projectName, majorVersion, { forceProduction: true }).fail ->
                 grunt.log.writeln "This is the first time building major version #{majorVersion}, creating the prod latest-version-#{majorVersion} pointer"
                 writePointerToAll versionWithPrefix, "latest-version-#{majorVersion}"
 
-                if majorVersion == 1
+            # If this is major version one and there is no existing "prod" current pointer, create it
+            if majorVersion == 1
+                promises.push fetchLatestVersionOfProject(projectName, 'current', { forceProduction: true }).fail ->
                     grunt.log.writeln "Also building the product current pointer for the first time"
                     writePointerToAll versionWithPrefix, "current"
 
-            .always ->
+            # Wait until two previous fetches are finished to end task
+            Q.allSettled(promises).done ->
                 done()
-
-            .done()
 
         .done()
