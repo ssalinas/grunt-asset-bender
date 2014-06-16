@@ -1,7 +1,7 @@
 {
   "name": "grunt-asset-bender",
   "description": "A series of grunt tasks to help integrate asset bender pre-compilation, versioning, etc into a grunt workflow.",
-  "version": "0.2.0-beta4",
+  "version": "0.2.1",
   "homepage": "https://github.com/HubSpot/grunt-asset-bender",
   "author": {
     "name": "Tim Finley"
@@ -23,7 +23,7 @@
     "glob": "~3.2.6",
     "wrench": "~1.5.1",
     "execSync": "~1.0.1-pre",
-    "hsstatic": "~0.14.2"
+    "hsstatic": "git+ssh://git@git.hubteam.com/HubSpot/HSStatic.git#v0.14.2"
   },
   "devDependencies": {
     "nodeunit": "~0.8.1"
