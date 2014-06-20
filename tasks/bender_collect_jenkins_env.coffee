@@ -108,8 +108,8 @@ module.exports = (grunt) ->
 
             # Mirror archive directory
             if utils.envVarEnabled('USE_LOCAL_ARCHIVE_MIRROR', true)
-                # Just use temp for now since the cacheDir isn't yet saved between builds
-                mirrorParentDir = '/tmp'
+                # Just use jenkins home for now since the cacheDir isn't yet saved between builds
+                mirrorParentDir = grunt.config.get('bender.build.root')
                 # mirrorParentDir = grunt.config.get('bender.build.cacheDir') or '/tmp'
 
                 grunt.config.set 'bender.build.mirrorArchiveDir', path.join(mirrorParentDir, 'mirrored_static_downloads')
