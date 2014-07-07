@@ -20,7 +20,8 @@ module.exports = (grunt) ->
         stopwatch   = utils.graphiteStopwatch(grunt)
 
         options = @options
-            project: projectDir or process.cwd()
+            project: projectDir ? process.cwd()
+            extraProjects: @options()?.extraProjects
             archiveDir: path.join tempDir, 'static-archive'
             assetBenderPath: grunt.config.get 'bender.assetBenderDir'
 

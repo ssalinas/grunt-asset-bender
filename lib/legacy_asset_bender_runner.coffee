@@ -26,6 +26,7 @@ exports.init = (grunt) ->
 
             @projects = options.project
             @projects = [ @projects ] if @projects? and not Array.isArray @projects
+            @projects = @projects.concat options.extraProjects if options.extraProjects?
 
             @buildVersionMap = options.buildVersions
 

@@ -28,20 +28,30 @@ module.exports = (grunt) ->
             destDir: grunt.config.get('bender.build.baseOutputDir') or path.join(process.cwd(), "build")
             assetBenderPath: grunt.config.get 'bender.assetBenderDir'
 
-        projectName      = grunt.config.get 'bender.build.projectName' or path.basename(options.project)
-        fixedProjectDeps = grunt.config.get 'bender.build.fixedProjectDeps'
-        stopwatch        = utils.graphiteStopwatch(grunt)
-        version          = grunt.config.get 'bender.build.version'
-        buildVersions    = undefined
+        projectName        = grunt.config.get 'bender.build.projectName' or path.basename(options.project)
+        fixedProjectDeps   = grunt.config.get 'bender.build.fixedProjectDeps'
+        stopwatch          = utils.graphiteStopwatch(grunt)
+        version            = grunt.config.get 'bender.build.version'
+        ignoreBuildNumber  = grunt.config.get 'bender.build.customLocalConfig.ignoreBuildNumber'
+        buildVersions      = undefined
 
         if fixedProjectDeps and version
             buildVersions = _.extend {}, grunt.config.get('bender.build.fixedProjectDeps')
             buildVersions[projectName] = version
 
+            # Fake build numbers for extra projects
+            if ignoreBuildNumber and options.extraProjects
+                for projectPath in options.extraProjects
+                    if not buildVersions[dirName]?
+                        dirName = path.basename projectPath
+                        buildVersions[dirName] = 'static'
+
             grunt.verbose.writeln "Dependency versions interpolated during compilation:"
             grunt.verbose.writeln JSON.stringify(buildVersions, null, 4)
         else
             grunt.verbose.writeln "Not interpolating any dependency versions during compilation"
+
+
 
 
         modesBuilt = []
@@ -52,6 +62,7 @@ module.exports = (grunt) ->
         # The debug compilation process
         debugOptions = _.extend {}, options,
             project: options.project
+            extraProjects: options.extraProjects
             mode: 'development'
             restrict: projectName
             destDir: "#{options.destDir}-debug"
