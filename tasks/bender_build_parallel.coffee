@@ -42,8 +42,9 @@ module.exports = (grunt) ->
             # Fake build numbers for extra projects
             if ignoreBuildNumber and options.extraProjects
                 for projectPath in options.extraProjects
+                    dirName = path.basename projectPath
+
                     if not buildVersions[dirName]?
-                        dirName = path.basename projectPath
                         buildVersions[dirName] = 'static'
 
             grunt.verbose.writeln "Dependency versions interpolated during compilation:"
