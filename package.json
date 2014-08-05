@@ -1,7 +1,7 @@
 {
   "name": "grunt-asset-bender",
   "description": "A series of grunt tasks to help integrate asset bender pre-compilation, versioning, etc into a grunt workflow.",
-  "version": "0.2.2",
+  "version": "0.2.3",
   "homepage": "https://github.com/HubSpot/grunt-asset-bender",
   "author": {
     "name": "Tim Finley"
