@@ -35,6 +35,7 @@ module.exports = (grunt) ->
             command: 'download-built-deps'
             destDir: options.builtArchiveDir
             mirrorArchiveDir: options.mirrorArchiveDir or grunt.config.get('bender.build.mirrorArchiveDir')
+            nocolor: grunt.config.get 'bender.build.hideColor'
 
         stopwatch.start 'download_prebuilt_static_deps'
 

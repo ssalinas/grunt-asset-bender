@@ -44,6 +44,10 @@ exports.init = (grunt) ->
             @limitTo = options.limitTo
             @ignore = options.ignore
             @production = options.production
+            @nocolor = options.nocolor
+
+            # Default to --nocolor when buffering
+            @nocolor = false if @bufferOutput and not @nocolor?
 
             # other (non-hs-static) options
             @envVars = options.envVars or {}
@@ -98,6 +102,7 @@ exports.init = (grunt) ->
             debugFlag:               "--debug"
             usePrebuiltFlag:         "--use-prebuilt-static-conf"
             productionFlag:          "--production"
+            nocolorFlag:             "--nocolor"
 
         for own funcName, flag of basicOptionFunctions
             do (funcName, flag) ->

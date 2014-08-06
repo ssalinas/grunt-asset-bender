@@ -32,6 +32,7 @@ module.exports = (grunt) ->
             archiveDir: options.archiveDir
             mirrorArchiveDir: options.mirrorArchiveDir or grunt.config.get('bender.build.mirrorArchiveDir')
             fixedDepsPath: dependencyTreeOutputPath
+            nocolor: grunt.config.get 'bender.build.hideColor'
 
             # Treat any runtime deps as regular deps, so that they are downloaded
             # and ready when test code is built and run (it is very likely that

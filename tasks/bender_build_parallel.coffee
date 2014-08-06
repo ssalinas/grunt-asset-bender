@@ -73,6 +73,7 @@ module.exports = (grunt) ->
             tempDir: "#{grunt.config.get 'bender.build.sprocketsCacheDir'}-debug"
             globalAssetsDir: path.join(grunt.config.get('bender.build.tempDir'), 'hs-static-global')
             domain: grunt.config.get 'bender.build.forcedDomain'
+            nocolor: grunt.config.get 'bender.build.hideColor'
 
             # By default, stream out the debug build and buffer the compressed build
             # output for later

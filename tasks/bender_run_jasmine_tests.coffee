@@ -44,6 +44,7 @@ module.exports = (grunt) ->
                 command: 'jasmine'
                 headless: true
                 buildVersions: buildVersions
+                nocolor: grunt.config.get 'bender.build.hideColor'
 
             stopwatch.start 'jasmine_test_duration'
 
