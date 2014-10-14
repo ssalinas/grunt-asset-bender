@@ -5,7 +5,10 @@ Q = require 'q'
 
 
 HS_STATIC_EXECUTABLE_NAME = 'hs-static'
-HS_STATIC_DEFAULT_PATH = "~/dev/src/hubspot_static_daemon"
+HS_STATIC_DEFAULT_PATHS = [
+    "~/src/hubspot_static_daemon"
+    "~/dev/src/hubspot_static_daemon"
+]
 HS_STATIC_PATH_ENV_NAME = 'HS_STATIC_PATH'
 
 
@@ -51,7 +54,15 @@ exports.init = (grunt) ->
 
             # other (non-hs-static) options
             @envVars = options.envVars or {}
-            @path = utils.expandHomeDirectory(process.env[HS_STATIC_PATH_ENV_NAME] or options.assetBenderPath or HS_STATIC_DEFAULT_PATH)
+            @path = utils.expandHomeDirectory(process.env[HS_STATIC_PATH_ENV_NAME] or options.assetBenderPath)
+
+            if not grunt.file.exists(@path)
+                for defaultPath in HS_STATIC_DEFAULT_PATHS
+                    defaultPath = utils.expandHomeDirectory defaultPath
+                    if grunt.file.exists(defaultPath)
+                        @path = defaultPath
+                        break
+
             @executable = path.join @path, HS_STATIC_EXECUTABLE_NAME
 
             unless grunt.file.exists @executable
