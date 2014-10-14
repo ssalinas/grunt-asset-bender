@@ -41,6 +41,10 @@ module.exports = (grunt) ->
         # Non-required settings
         grunt.config.set 'bender.build.skipUpload', utils.envVarEnabled('SKIP_STATIC_UPLOAD', false)
 
+        ignoreBuild = utils.envVarEnabled('SKIP_STATIC_VERSION_CHECK', false) and grunt.config.get('bender.build.skipUpload')
+        if ignoreBuild is true
+            grunt.config.set 'bender.build.customLocalConfig.ignoreBuildNumber', true
+
         console.log "grunt.config.get('bender.build.skipUpload')", grunt.config.get('bender.build.skipUpload')
 
         # Tempory directories
