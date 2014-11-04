@@ -191,6 +191,7 @@ exports.init = (grunt) ->
         # Ignore hidden, binary, and image types (not-exhaustive)
         typesToIgnore = [
             '.*'
+            '*.sedbak'
             '*.gif'
             '*.jpg'
             '*.png'
@@ -211,7 +212,7 @@ exports.init = (grunt) ->
         parts.push '-print0'
 
         # Start xargs part (xargs -0 sed -i '' -e ...)
-        parts.push '|', 'xargs'
+        parts.push '|', 'LC_ALL=C xargs'
 
         if options.parallel
             parts.push '-P', numCPUs()
