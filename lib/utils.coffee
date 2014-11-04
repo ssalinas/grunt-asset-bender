@@ -200,6 +200,9 @@ exports.init = (grunt) ->
             '*.swf'
             '*.cur'
             '*.pdn'
+            '*.eot'
+            '*.woff'
+            '*.ttf'
         ]
 
         for extension in typesToIgnore
