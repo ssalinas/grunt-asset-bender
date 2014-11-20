@@ -72,7 +72,11 @@ exports.init = (grunt) ->
         newObject
 
     loadBenderProjectConfig = (projectDir) ->
-        configPath = path.join projectDir, 'static', 'static_conf.json'
+        if process.env.CUSTOM_STATIC_CONF_PATH?
+            configPath = process.env.CUSTOM_STATIC_CONF_PATH
+        else
+            configPath = path.join projectDir, 'static', 'static_conf.json'
+
         contents = grunt.file.read configPath
         config = JSON.parse contents
 
