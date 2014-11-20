@@ -9,7 +9,7 @@ module.exports = (grunt) ->
 
         # Necessary settings (that normally come from running bender_build_parallel)
         compressedDestDir = grunt.config.get('bender.build.baseOutputDir')
-        devDestDir = "#{devDestDir}-debug"
+        devDestDir = "#{compressedDestDir}-debug"
 
         grunt.config.set "bender.build.development.outputDir", devDestDir
         grunt.config.set "bender.build.compressed.outputDir", compressedDestDir
