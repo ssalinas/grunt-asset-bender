@@ -23,6 +23,11 @@ module.exports = (grunt) ->
     grunt.registerTask 'bender_build_parallel', 'Precompile debug and compressed assets in parallel using HubSpot static v3', ->
         done = @async()
 
+        grunt.config.requires 'bender.assetBenderDir',
+                              'bender.build.tempDir',
+                              'bender.build.fixedProjectDeps',
+                              'bender.build.version'
+
         options = @options
             project: grunt.config.get('bender.build.copiedProjectDir') or process.cwd()
             destDir: grunt.config.get('bender.build.baseOutputDir') or path.join(process.cwd(), "build")

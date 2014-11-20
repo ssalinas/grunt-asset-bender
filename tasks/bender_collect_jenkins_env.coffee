@@ -26,7 +26,9 @@ module.exports = (grunt) ->
         setRequiredBuildConfig 'bender.build.scmRev', process.env.GIT_COMMIT or process.env.SVN_REVISION
         setRequiredBuildConfig 'bender.build.forcedDomain', process.env.FORCED_STATIC_DOMAIN or "//static.hsappstatic.net"
         setRequiredBuildConfig 'bender.assetCDNRegex', /\/\/static2cdn.hubspot.(com|net)\//
-        setRequiredBuildConfig 'bender.assetBenderDir', process.env.HS_STATIC_REPO_DIR
+
+        # Set the asset bender dir if passed
+        grunt.config.set 'bender.assetBenderDir', process.env.HS_STATIC_REPO_DIR
 
         # Turn of coloring by default if it is _actually_ running on Jenkins.
         # (JENKINS_URL is an env var we don't mimic)
