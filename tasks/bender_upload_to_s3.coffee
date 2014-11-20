@@ -29,7 +29,7 @@ module.exports = (grunt) ->
             grunt.log.writeln "Uploading assets to s3...\n"
 
             pythonBin = process.env.PYTHON_BIN
-            pythonBin = 'python26' unless pythonBin
+            pythonBin = 'python2.6' unless pythonBin
 
             uploadScript = path.join __dirname, '..', 'lib', 'upload_project_assets_to_s3_parallel.py'
             cmd = "#{pythonBin} #{uploadScript} -p \"#{projectName}\" "
