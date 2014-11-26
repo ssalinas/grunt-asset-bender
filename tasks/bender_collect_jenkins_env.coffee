@@ -149,11 +149,11 @@ module.exports = (grunt) ->
             # Graphite client for other tasks to use
             grunt.config.set 'bender.graphite.server', process.env.GRAPHITE_SERVER
             grunt.config.set 'bender.graphite.port', process.env.GRAPHITE_PORT
-            grunt.config.set 'bender.graphite.namespace', process.env.GRAPHITE_NAMESPACE
+            grunt.config.set 'bender.graphite.namespace', (process.env.METRIC_KEY_PREFIX or process.env.GRAPHITE_NAMESPACE)
 
             grunt.log.writeln "process.env.GRAPHITE_SERVER", process.env.GRAPHITE_SERVER
             grunt.log.writeln "process.env.GRAPHITE_PORT", process.env.GRAPHITE_PORT
-            grunt.log.writeln "process.env.GRAPHITE_NAMESPACE", process.env.GRAPHITE_NAMESPACE
+            grunt.log.writeln "process.env.GRAPHITE_NAMESPACE", (process.env.METRIC_KEY_PREFIX or process.env.GRAPHITE_NAMESPACE)
 
 
             # Output all build config when --verbose

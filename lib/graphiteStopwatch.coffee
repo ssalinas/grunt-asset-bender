@@ -1,7 +1,14 @@
 
 class GraphiteStopwatch
   constructor: (prefix, graphiteClient) ->
-    @prefix = prefix or  ''
+    if prefix
+      @prefix = prefix
+
+      # Ensure the prefix ends with a dot
+      @prefix = "#{@prefix}." if @prefix[@prefix.length - 1] != '.'
+    else
+      @prefix = ''
+
     @client = graphiteClient
 
   _start: (name) ->
@@ -71,8 +78,8 @@ class DualGraphiteStopwatch extends GraphiteStopwatch
     "Stopped graphite '#{name}' timer: #{duration1}\nStopped graphite '#{@secondaryPrefix + name}' timer: #{duration2}"
 
 class FauxGraphiteStopwatch extends GraphiteStopwatch
-  constructor: ->
-    super('', null)
+  constructor: (prefix='') ->
+    super(prefix, null)
 
   _write: (metrics) ->
     # for own name, duration of metrics

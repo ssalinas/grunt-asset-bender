@@ -120,15 +120,15 @@ exports.init = (grunt) ->
     createGraphiteStopwatch = ->
         server =    grunt.config.get 'bender.graphite.server'
         port =      grunt.config.get 'bender.graphite.port'
-        namespace = grunt.config.get('bender.graphite.namespace') ? 'jenkins'
+        namespace = grunt.config.get('bender.graphite.namespace') ? 'jenkins.bender'
         jobName =   grunt.config.get 'bender.build.jobName'
 
         if server and port
             graphiteClient = graphite.createClient("plaintext://#{server}:#{port}")
-            _global_stopwatch = new DualGraphiteStopwatch("#{namespace}.bender.", "#{jobName}.", graphiteClient)
+            _global_stopwatch = new DualGraphiteStopwatch(namespace, "#{jobName}.", graphiteClient)
         else
             grunt.log.writeln "Not logging to graphite, GRAPHITE_SERVER and GRAPHITE_PORT must be set."
-            _global_stopwatch = new FauxGraphiteStopwatch()
+            _global_stopwatch = new FauxGraphiteStopwatch(namespace)
 
     envVarEnabled = (envVarName, defaultValue = true) ->
         value = process.env[envVarName] ? new String(defaultValue)
