@@ -19,7 +19,7 @@
     "graphite": "~0.0.6",
     "hsstatic": "git+ssh://git@git.hubteam.com/HubSpot/HSStatic.git#v0.14.2",
     "mkdirp": "~0.3.5",
-    "opentsdb-socket": "~0.0.2",
+    "nopents": "^0.1.4",
     "q": "~0.9.3",
     "rimraf": "~2.2.2",
     "underscore": "~1.5.1",
