@@ -18,7 +18,7 @@ module.exports = (grunt) ->
 
         projectDir = grunt.config.get 'bender.build.copiedProjectDir'
         outputDir = grunt.config.get('bender.build.test.outputDir')
-        stopwatch  = utils.graphiteStopwatch(grunt)
+        stopwatch  = utils.MetricStopwatch(grunt)
 
         hasSpecs = utils.hasJasmineSpecs()
         jasmineTestsEnabled = utils.jasmineTestsEnabled()

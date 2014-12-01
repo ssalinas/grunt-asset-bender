@@ -18,7 +18,7 @@ module.exports = (grunt) ->
         tempDir     = grunt.config.get 'bender.build.tempDir'
         projectName = grunt.config.get 'bender.build.projectName'
         projectDir  = grunt.config.get 'bender.build.copiedProjectDir'
-        stopwatch   = utils.graphiteStopwatch(grunt)
+        stopwatch   = utils.MetricStopwatch(grunt)
 
         options = @options
             project: projectDir or process.cwd()

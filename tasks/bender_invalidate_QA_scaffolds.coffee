@@ -14,7 +14,7 @@ module.exports = (grunt) ->
 
         jenkinsToolsDir  = grunt.config.get 'bender.build.jenkinsToolsDir'
         projectName      = grunt.config.get 'bender.build.projectName'
-        stopwatch        = utils.graphiteStopwatch(grunt)
+        stopwatch        = utils.MetricStopwatch(grunt)
 
 
         if utils.envVarEnabled('SKIP_STATIC_QA_DEPLOY', false)

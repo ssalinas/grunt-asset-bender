@@ -6,7 +6,8 @@ _ = require 'underscore'
 { inspect } = require 'util'
 { spawn } = require 'child_process'
 
-{ DualGraphiteStopwatch, FauxGraphiteStopwatch } = require '../lib/graphiteStopwatch.coffee'
+{ DualMetricStopwatch, FauxMetricStopwatch } = require '../lib/MetricStopwatch.coffee'
+SimpleOpenTSDBClient = require './simple-opentsdb-client.coffee'
 
 
 innerExports = undefined
@@ -114,21 +115,28 @@ exports.init = (grunt) ->
 
     _global_stopwatch = null
 
-    graphiteStopwatch = ->
-        stopwatch = _global_stopwatch ? createGraphiteStopwatch(grunt)
+    MetricStopwatch = ->
+        stopwatch = _global_stopwatch ? createMetricStopwatch(grunt)
 
-    createGraphiteStopwatch = ->
-        server =    grunt.config.get 'bender.graphite.server'
-        port =      grunt.config.get 'bender.graphite.port'
-        namespace = grunt.config.get('bender.graphite.namespace') ? 'jenkins.bender'
-        jobName =   grunt.config.get 'bender.build.jobName'
+    createMetricStopwatch = ->
+        jobName =         grunt.config.get 'bender.build.jobName'
+        namespace =       grunt.config.get('bender.metric.namespace') ? 'jenkins.bender'
 
-        if server and port
-            graphiteClient = graphite.createClient("plaintext://#{server}:#{port}")
-            _global_stopwatch = new DualGraphiteStopwatch(namespace, "#{jobName}.", graphiteClient)
+        openTSDBServer =  grunt.config.get 'bender.OpenTSDB.server'
+        openTSDBPort =    grunt.config.get 'bender.OpenTSDB.port'
+
+        graphiteServer =  grunt.config.get 'bender.graphite.server'
+        graphitePort =    grunt.config.get 'bender.graphite.port'
+
+        if openTSDBServer and openTSDBPort
+            metricClient = new SimpleOpenTSDBClient(openTSDBServer, openTSDBPort)
+            _global_stopwatch = new DualMetricStopwatch(namespace, "#{jobName}.", metricClient)
+        else if graphiteServer and graphitePort
+            metricClient = graphite.createClient("plaintext://#{graphiteServer}:#{graphitePort}")
+            _global_stopwatch = new DualMetricStopwatch(namespace, "#{jobName}.", metricClient)
         else
-            grunt.log.writeln "Not logging to graphite, GRAPHITE_SERVER and GRAPHITE_PORT must be set."
-            _global_stopwatch = new FauxGraphiteStopwatch(namespace)
+            grunt.log.writeln "Not logging to OpenTSDB or graphite, OPENTSDB_SERVER and OPENTSDB_PORT (or GRAPHITE_SERVER and GRAPHITE_PORT) must be set."
+            _global_stopwatch = new FauxMetricStopwatch(namespace)
 
     envVarEnabled = (envVarName, defaultValue = true) ->
         value = process.env[envVarName] ? new String(defaultValue)
@@ -287,7 +295,7 @@ exports.init = (grunt) ->
         loadBenderProjectConfig
         executeCommand
         isGNU
-        graphiteStopwatch
+        MetricStopwatch
         envVarEnabled
         moveSync
         copyFileSync

@@ -1,6 +1,6 @@
 
-class GraphiteStopwatch
-  constructor: (prefix, graphiteClient) ->
+class MetricStopwatch
+  constructor: (prefix, metricClient) ->
     if prefix
       @prefix = prefix
 
@@ -9,10 +9,10 @@ class GraphiteStopwatch
     else
       @prefix = ''
 
-    @client = graphiteClient
+    @client = metricClient
 
   _start: (name) ->
-    console.log "Starting graphite '#{name}' timer"
+    console.log "Starting metric '#{name}' timer"
     @start_times = @start_times ? {}
     @start_times[name] = new Date() if name
 
@@ -41,20 +41,20 @@ class GraphiteStopwatch
 
   stop: (name) ->
     duration = @_stop(name)
-    console.log "Stopped graphite '#{name}' timer: #{duration}"
+    console.log "Stopped metric '#{name}' timer: #{duration}"
 
   stopButDontPrint: (name) ->
     duration = @_stop(name)
-    "Stopped graphite '#{name}' timer: #{duration}"
+    "Stopped metric '#{name}' timer: #{duration}"
 
   _write: (metrics) ->
     @client.write metrics
 
 
-class DualGraphiteStopwatch extends GraphiteStopwatch
-  constructor: (prefix, secondaryPrefix, graphiteClient) ->
+class DualMetricStopwatch extends MetricStopwatch
+  constructor: (prefix, secondaryPrefix, metricClient) ->
     @secondaryPrefix = secondaryPrefix
-    super prefix, graphiteClient
+    super prefix, metricClient
 
   start: (name) ->
     @_start name
@@ -69,15 +69,15 @@ class DualGraphiteStopwatch extends GraphiteStopwatch
   stop: (name) ->
     duration1 = @_stop name
     duration2 = @_stop @secondaryPrefix + name
-    console.log "Stopped graphite '#{name}' timer: #{duration1}"
-    console.log "Stopped graphite '#{@secondaryPrefix + name}' timer: #{duration2}"
+    console.log "Stopped metric '#{name}' timer: #{duration1}"
+    console.log "Stopped metric '#{@secondaryPrefix + name}' timer: #{duration2}"
 
   stopButDontPrint: (name) ->
     duration1 = @_stop name
     duration2 = @_stop @secondaryPrefix + name
-    "Stopped graphite '#{name}' timer: #{duration1}\nStopped graphite '#{@secondaryPrefix + name}' timer: #{duration2}"
+    "Stopped metric '#{name}' timer: #{duration1}\nStopped metric '#{@secondaryPrefix + name}' timer: #{duration2}"
 
-class FauxGraphiteStopwatch extends GraphiteStopwatch
+class FauxMetricStopwatch extends MetricStopwatch
   constructor: (prefix='') ->
     super(prefix, null)
 
@@ -86,4 +86,4 @@ class FauxGraphiteStopwatch extends GraphiteStopwatch
     #   console.log "#{name} took: #{duration}s"
 
 
-module.exports = { GraphiteStopwatch, DualGraphiteStopwatch, FauxGraphiteStopwatch }
+module.exports = { MetricStopwatch, DualMetricStopwatch, FauxMetricStopwatch }

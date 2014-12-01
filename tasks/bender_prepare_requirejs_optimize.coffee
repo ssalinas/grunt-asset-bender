@@ -29,7 +29,7 @@ module.exports = (grunt) ->
         debugOutputDir      = grunt.config.get 'bender.build.development.outputDir'
         assetCDNRegex       = grunt.config.get 'bender.assetCDNRegex'
         outputDir           = utils.preferredOutputDir(grunt)
-        stopwatch           = utils.graphiteStopwatch(grunt)
+        stopwatch           = utils.MetricStopwatch(grunt)
 
         configThatShouldntBeAlreadySet = [
             'baseUrl',

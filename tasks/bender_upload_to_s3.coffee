@@ -22,7 +22,7 @@ module.exports = (grunt) ->
             grunt.config.requires 'bender.build.projectName'
 
             projectName      = grunt.config.get 'bender.build.projectName'
-            stopwatch        = utils.graphiteStopwatch(grunt)
+            stopwatch        = utils.MetricStopwatch(grunt)
             outputDir        = utils.preferredOutputDir(grunt)
 
             # upload the assets to S3 (too lazy to port at this point)

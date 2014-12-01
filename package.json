@@ -14,16 +14,16 @@
     "url": "https://github.com/HubSpot/grunt-asset-bender/issues"
   },
   "dependencies": {
-    "q": "~0.9.3",
-    "underscore": "~1.5.1",
-    "hsstatic": "~0.10.0",
-    "graphite": "~0.0.6",
-    "mkdirp": "~0.3.5",
-    "rimraf": "~2.2.2",
-    "glob": "~3.2.6",
-    "wrench": "~1.5.1",
     "execSync": "~1.0.1-pre",
-    "hsstatic": "git+ssh://git@git.hubteam.com/HubSpot/HSStatic.git#v0.14.2"
+    "glob": "~3.2.6",
+    "graphite": "~0.0.6",
+    "hsstatic": "git+ssh://git@git.hubteam.com/HubSpot/HSStatic.git#v0.14.2",
+    "mkdirp": "~0.3.5",
+    "opentsdb-socket": "~0.0.2",
+    "q": "~0.9.3",
+    "rimraf": "~2.2.2",
+    "underscore": "~1.5.1",
+    "wrench": "~1.5.1"
   },
   "devDependencies": {
     "nodeunit": "~0.8.1"

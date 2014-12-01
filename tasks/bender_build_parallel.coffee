@@ -35,7 +35,7 @@ module.exports = (grunt) ->
 
         projectName        = grunt.config.get 'bender.build.projectName' or path.basename(options.project)
         fixedProjectDeps   = grunt.config.get 'bender.build.fixedProjectDeps'
-        stopwatch          = utils.graphiteStopwatch(grunt)
+        stopwatch          = utils.MetricStopwatch(grunt)
         version            = grunt.config.get 'bender.build.version'
         ignoreBuildNumber  = grunt.config.get 'bender.build.customLocalConfig.ignoreBuildNumber'
         buildVersions      = undefined
