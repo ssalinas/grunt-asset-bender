@@ -1,7 +1,7 @@
 {
   "name": "grunt-asset-bender",
   "description": "A series of grunt tasks to help integrate asset bender pre-compilation, versioning, etc into a grunt workflow.",
-  "version": "0.3.2",
+  "version": "0.3.3",
   "homepage": "https://github.com/HubSpot/grunt-asset-bender",
   "author": {
     "name": "Tim Finley"
@@ -30,6 +30,9 @@
   },
   "peerDependencies": {
     "grunt": "~0.4.1"
+  },
+  "bin": {
+    "default_jenkins_build": "./bin/run_default_jenkins_build.sh"
   },
   "keywords": [
     "gruntplugin",
