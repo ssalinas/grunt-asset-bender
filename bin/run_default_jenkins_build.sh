@@ -1,3 +1,6 @@
+# Uploaded to http://hubspot.com.s3.amazonaws.com/tools/front-end/run_default_jenkins_build.sh manually.
+# (hubspot.com s3 bucket)
+
 
 # If there is a package.json, do npm install, otherwise just install the latest version
 # of grunt-asset-bender (unless we are locally developing the module)
