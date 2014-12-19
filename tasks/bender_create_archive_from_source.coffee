@@ -18,11 +18,13 @@ module.exports = (grunt) ->
         projectDir         = grunt.config.get 'bender.build.copiedProjectDir'
         versionWithPrefix  = grunt.config.get 'bender.build.versionWithStaticPrefix'
 
+        srcDirParent       = path.join(projectDir, '..')
+
 
         sourceArchiveName = "#{projectName}-#{versionWithPrefix}-src.tar.gz"
-        grunt.log.writeln "Creating #{sourceArchiveName}, an archive of the version interpolated source."
+        grunt.log.writeln "Creating #{sourceArchiveName}, an archive of the version interpolated source (from #{srcDirParent})"
 
-        utils.executeCommand("tar cvzf #{sourceArchiveName} --exclude=.svn  --exclude=.git #{projectName}/", path.join(projectDir, '..')).fail (err) ->
+        utils.executeCommand("tar cvzf #{sourceArchiveName} --exclude=.svn  --exclude=.git #{projectName}/", srcDirParent).fail (err) ->
             grunt.fail.warn "Error building #{sourceArchiveName} archive"
         .done ->
             utils.moveSync path.join(projectDir, '..', sourceArchiveName), path.join(baseOutputDir, sourceArchiveName)

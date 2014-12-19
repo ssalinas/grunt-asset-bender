@@ -26,7 +26,13 @@ module.exports = (grunt) ->
         setRequiredBuildConfig 'bender.build.scmRev', process.env.GIT_COMMIT or process.env.SVN_REVISION
         setRequiredBuildConfig 'bender.build.forcedDomain', process.env.FORCED_STATIC_DOMAIN or "//static.hsappstatic.net"
         setRequiredBuildConfig 'bender.assetCDNRegex', /\/\/static2cdn.hubspot.(com|net)\//
-        setRequiredBuildConfig 'bender.assetBenderDir', process.env.HS_STATIC_REPO_DIR
+
+        # Set the asset bender dir if passed
+        grunt.config.set 'bender.assetBenderDir', process.env.HS_STATIC_REPO_DIR
+
+        # Turn of coloring by default if it is _actually_ running on Jenkins.
+        # (JENKINS_URL is an env var we don't mimic)
+        setRequiredBuildConfig 'bender.build.hideColor', !!process.env.JENKINS_URL
 
         origProjectDir = grunt.config.get 'bender.build.originalProjectDir'
 
@@ -140,14 +146,16 @@ module.exports = (grunt) ->
             setRequiredBuildConfig 'bender.build.version', "#{majorVersion}.#{minorVersion}"
             setRequiredBuildConfig 'bender.build.versionWithStaticPrefix', "static-#{majorVersion}.#{minorVersion}"
 
-            # Graphite client for other tasks to use
+            # Metric client for other tasks to use
+            grunt.config.set 'bender.metric.namespace', (process.env.METRIC_KEY_PREFIX or process.env.GRAPHITE_NAMESPACE)
             grunt.config.set 'bender.graphite.server', process.env.GRAPHITE_SERVER
             grunt.config.set 'bender.graphite.port', process.env.GRAPHITE_PORT
-            grunt.config.set 'bender.graphite.namespace', process.env.GRAPHITE_NAMESPACE
+            grunt.config.set 'bender.OpenTSDB.server', process.env.OPENTSDB_SERVER
+            grunt.config.set 'bender.OpenTSDB.port', process.env.OPENTSDB_PORT
 
-            grunt.log.writeln "process.env.GRAPHITE_SERVER", process.env.GRAPHITE_SERVER
-            grunt.log.writeln "process.env.GRAPHITE_PORT", process.env.GRAPHITE_PORT
-            grunt.log.writeln "process.env.GRAPHITE_NAMESPACE", process.env.GRAPHITE_NAMESPACE
+            grunt.log.writeln "Metric namespace: ", (process.env.METRIC_KEY_PREFIX or process.env.GRAPHITE_NAMESPACE)
+            grunt.log.writeln "Metric server: ", grunt.config.get('bender.OpenTSDB.server') or grunt.config.get('bender.graphite.server')
+            grunt.log.writeln "Metric port: ", grunt.config.get('bender.OpenTSDB.port') or grunt.config.get('bender.graphite.port')
 
 
             # Output all build config when --verbose
@@ -157,7 +165,7 @@ module.exports = (grunt) ->
             grunt.verbose.writeln formattedConfig
 
 
-            utils.graphiteStopwatch(grunt).start('total_build_duration')
+            utils.MetricStopwatch(grunt).start('total_build_duration')
 
             # Store whether the command line tools are GNU-style for future tasks
             utils.isGNU().done (isGNU) ->

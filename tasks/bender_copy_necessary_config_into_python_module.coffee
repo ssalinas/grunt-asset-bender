@@ -12,7 +12,6 @@ module.exports = (grunt) ->
 
         grunt.config.requires 'bender.build.projectName',
                               'bender.build.originalProjectDir',
-                              'bender.build.archiveDir',
                               'bender.build.version',
                               'bender.build.versionWithStaticPrefix',
                               'bender.build.majorVersion'

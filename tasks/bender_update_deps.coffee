@@ -17,10 +17,11 @@ module.exports = (grunt) ->
         tempDir     = grunt.config.get 'bender.build.tempDir'
         projectName = grunt.config.get 'bender.build.projectName'
         projectDir  = grunt.config.get 'bender.build.copiedProjectDir'
-        stopwatch   = utils.graphiteStopwatch(grunt)
+        stopwatch   = utils.MetricStopwatch(grunt)
 
         options = @options
-            project: projectDir or process.cwd()
+            project: projectDir ? process.cwd()
+            extraProjects: @options()?.extraProjects
             archiveDir: path.join tempDir, 'static-archive'
             assetBenderPath: grunt.config.get 'bender.assetBenderDir'
 
@@ -31,6 +32,12 @@ module.exports = (grunt) ->
             archiveDir: options.archiveDir
             mirrorArchiveDir: options.mirrorArchiveDir or grunt.config.get('bender.build.mirrorArchiveDir')
             fixedDepsPath: dependencyTreeOutputPath
+            nocolor: grunt.config.get 'bender.build.hideColor'
+
+            # Treat any runtime deps as regular deps, so that they are downloaded
+            # and ready when test code is built and run (it is very likely that
+            # runtime deps are needed for the tests)
+            production: false
 
         stopwatch.start 'download_static_deps'
 
@@ -45,4 +52,4 @@ module.exports = (grunt) ->
             grunt.log.writeln "Done with downloading deps."
             done()
         , (message) ->
-            done new Error(message || "unkown error")
+            done new Error(message || "Unknown error")

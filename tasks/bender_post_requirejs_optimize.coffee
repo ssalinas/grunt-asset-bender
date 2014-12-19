@@ -11,7 +11,7 @@ module.exports = (grunt) ->
 
         requirejsConfig     = grunt.config.get 'requirejs.compile.options'
         outputDir           = utils.preferredOutputDir(grunt)
-        stopwatch           = utils.graphiteStopwatch(grunt)
+        stopwatch           = utils.MetricStopwatch(grunt)
 
         stopwatch.stop('requirejs_optimizer')
 

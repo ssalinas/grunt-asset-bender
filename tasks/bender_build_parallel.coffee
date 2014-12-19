@@ -23,20 +23,34 @@ module.exports = (grunt) ->
     grunt.registerTask 'bender_build_parallel', 'Precompile debug and compressed assets in parallel using HubSpot static v3', ->
         done = @async()
 
+        grunt.config.requires 'bender.assetBenderDir',
+                              'bender.build.tempDir',
+                              'bender.build.fixedProjectDeps',
+                              'bender.build.version'
+
         options = @options
             project: grunt.config.get('bender.build.copiedProjectDir') or process.cwd()
             destDir: grunt.config.get('bender.build.baseOutputDir') or path.join(process.cwd(), "build")
             assetBenderPath: grunt.config.get 'bender.assetBenderDir'
 
-        projectName      = grunt.config.get 'bender.build.projectName' or path.basename(options.project)
-        fixedProjectDeps = grunt.config.get 'bender.build.fixedProjectDeps'
-        stopwatch        = utils.graphiteStopwatch(grunt)
-        version          = grunt.config.get 'bender.build.version'
-        buildVersions    = undefined
+        projectName        = grunt.config.get 'bender.build.projectName' or path.basename(options.project)
+        fixedProjectDeps   = grunt.config.get 'bender.build.fixedProjectDeps'
+        stopwatch          = utils.MetricStopwatch(grunt)
+        version            = grunt.config.get 'bender.build.version'
+        ignoreBuildNumber  = grunt.config.get 'bender.build.customLocalConfig.ignoreBuildNumber'
+        buildVersions      = undefined
 
         if fixedProjectDeps and version
             buildVersions = _.extend {}, grunt.config.get('bender.build.fixedProjectDeps')
             buildVersions[projectName] = version
+
+            # Fake build numbers for extra projects
+            if ignoreBuildNumber and options.extraProjects
+                for projectPath in options.extraProjects
+                    dirName = path.basename projectPath
+
+                    if not buildVersions[dirName]?
+                        buildVersions[dirName] = 'static'
 
             grunt.verbose.writeln "Dependency versions interpolated during compilation:"
             grunt.verbose.writeln JSON.stringify(buildVersions, null, 4)
@@ -44,13 +58,17 @@ module.exports = (grunt) ->
             grunt.verbose.writeln "Not interpolating any dependency versions during compilation"
 
 
+
+
         modesBuilt = []
         promises = []
         debugBuildPromise = null
+        compressedBuildPromise = null
 
         # The debug compilation process
         debugOptions = _.extend {}, options,
             project: options.project
+            extraProjects: options.extraProjects
             mode: 'development'
             restrict: projectName
             destDir: "#{options.destDir}-debug"
@@ -60,10 +78,21 @@ module.exports = (grunt) ->
             tempDir: "#{grunt.config.get 'bender.build.sprocketsCacheDir'}-debug"
             globalAssetsDir: path.join(grunt.config.get('bender.build.tempDir'), 'hs-static-global')
             domain: grunt.config.get 'bender.build.forcedDomain'
+            nocolor: grunt.config.get 'bender.build.hideColor'
 
             # By default, stream out the debug build and buffer the compressed build
             # output for later
             bufferOutput: false
+
+        # If this is a project using devDeps/runtimeDeps, don't include them in the debug build.
+        # Also, ignore any jasmine tests and run in separate build step (need to exclude
+        # integrate tests too? but they need to get uploaded...)
+        if utils.hasDevOrRuntimeDeps()
+            _.extend debugOptions,
+                production: true
+
+            debugOptions.ignore ?= []
+            debugOptions.ignore.push "#{projectName}/static/test/spec*"
 
         grunt.log.writeln ""
 
@@ -111,12 +140,13 @@ module.exports = (grunt) ->
 
         if options.skipCompressedBuild is true
             grunt.log.writeln "\nSkipping compressed build due to skipCompressedBuild"
+            compressedBuildPromise = Q()
         else
             do (compressedOptions) ->
                 compressedRunner = new LegacyAssetBenderRunner compressedOptions
                 stopwatch.start 'precompile_compressed_assets'
 
-                promises.push compressedRunner.run().then (result) ->
+                promises.push compressedBuildPromise = compressedRunner.run().then (result) ->
                     stopwatchOut = stopwatch.stopButDontPrint 'precompile_compressed_assets'
 
                     # Wait to print anything until debug is done
@@ -142,6 +172,49 @@ module.exports = (grunt) ->
                         grunt.fail.warn 'Compressed compile process failed'
 
 
+        # Since tests need the runtime & dev deps included, we will do a separate
+        # test compile pass when a project has any runtime or dev dependencies
+        #
+        # This test compile pass is run serially after the main compressed build
+        # finishes (but still in parallel with the debug build), so we can share
+        # the compressed build's cache.
+        if utils.needsToBuildTestsSeparately()
+
+            testPromise = compressedBuildPromise.then ->
+                testOptions = _.extend {}, compressedOptions,
+                    command: 'precompile_without_bundle_html'
+                    destDir: "#{options.destDir}-test"
+
+                    # *Only* build things in the test folder
+                    ignore: []
+                    limitTo: [
+                        "#{projectName}/static/test/*"
+                    ]
+
+                    # Treat any runtime deps that are needed to build/run
+                    # the tests to regular deps.
+                    production: false
+
+                testRunner = new LegacyAssetBenderRunner testOptions
+                stopwatch.start 'precompile_test_assets'
+
+                testRunner.run().then (result) ->
+                    stopwatch.stop 'precompile_test_assets'
+
+                    grunt.log.writeln "\nTest output\n===========\n"
+                    grunt.log.writeln result.stdoutAndStderr
+                    grunt.log.writeln "== End test output"
+
+                    grunt.config.set "bender.build.test.outputDir", testOptions.destDir
+
+                , (result) ->
+                    grunt.log.writeln "\nFailed test build output (code: #{result.code})\n=======================\n"
+                    grunt.log.writeln result.stdoutAndStderr
+                    grunt.fail.warn 'Test compile process failed'
+
+            promises.push testPromise
+
+
         if debugOptions.bufferOutput is false and not options.skipDebugBuild
             grunt.log.writeln "\nStreaming debug output\n======================"
         else if compressedOptions.bufferOutput is false and not options.skipCompressedBuild
@@ -149,6 +222,12 @@ module.exports = (grunt) ->
 
         Q.all(promises).done ->
             grunt.config.set 'bender.build.modesBuilt', modesBuilt
+
+            # Make sure that test dir is set even if there wasn't a separate test
+            # compile pass
+            if not grunt.config.get("bender.build.test.outputDir")?
+                grunt.config.set "bender.build.test.outputDir", utils.preferredOutputDir(grunt)
+
             grunt.log.writeln "Done with build."
             done()
         , (message) ->

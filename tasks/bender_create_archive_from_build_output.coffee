@@ -19,7 +19,7 @@ module.exports = (grunt) ->
 
 
         builtArchiveName = "#{projectName}-#{versionWithPrefix}.tar.gz"
-        grunt.log.writeln "Creating #{builtArchiveName}, an archive of the compiled output."
+        grunt.log.writeln "Creating #{builtArchiveName}, an archive of the compiled output (from #{outputDir})."
 
         utils.executeCommand("tar cvzf #{builtArchiveName} --exclude=.svn  --exclude=.git #{projectName}/", outputDir).fail (err) ->
             grunt.fail.warn "Error building #{builtArchiveName} archive"

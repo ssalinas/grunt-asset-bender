@@ -13,23 +13,23 @@ module.exports = (grunt) ->
         grunt.config.requires 'bender.build.projectName',
                               'bender.build.copiedProjectDir',
                               'bender.build.archiveDir',
-                              'bender.build.versionWithStaticPrefix'
+                              'bender.build.versionWithStaticPrefix',
+                              'bender.build.test.outputDir'
 
         projectDir = grunt.config.get 'bender.build.copiedProjectDir'
-        outputDir  = utils.preferredOutputDir(grunt)
-        stopwatch  = utils.graphiteStopwatch(grunt)
+        outputDir = grunt.config.get('bender.build.test.outputDir')
+        stopwatch  = utils.MetricStopwatch(grunt)
 
-        hasSpecs = fs.existsSync path.join projectDir, '/static/test/specs.js'
-        hasSpecs = fs.existsSync path.join projectDir, '/static/test/specs.coffee' if not hasSpecs
-        runJasmineTests = utils.envVarEnabled('RUN_JASMINE_TESTS', true)
+        hasSpecs = utils.hasJasmineSpecs()
+        jasmineTestsEnabled = utils.jasmineTestsEnabled()
 
         runTestOn = utils.preferredModeBuilt()
 
-        if hasSpecs and not runJasmineTests
-            grunt.log.writeln "Skipping jasmine tests since RUN_JASMINE_TESTS=#{runJasmineTests}\n"
+        if hasSpecs and not jasmineTestsEnabled
+            grunt.log.writeln "Skipping jasmine tests since RUN_JASMINE_TESTS=#{jasmineTestsEnabled}\n"
             done()
 
-        else if hasSpecs and runJasmineTests
+        else if hasSpecs and jasmineTestsEnabled
             grunt.log.writeln "Running jasmine tests\n"
 
             buildVersions = {}
@@ -44,6 +44,7 @@ module.exports = (grunt) ->
                 command: 'jasmine'
                 headless: true
                 buildVersions: buildVersions
+                nocolor: grunt.config.get 'bender.build.hideColor'
 
             stopwatch.start 'jasmine_test_duration'
 

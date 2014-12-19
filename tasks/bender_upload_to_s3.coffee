@@ -19,21 +19,19 @@ module.exports = (grunt) ->
             grunt.fail.warn "This is a locally run build, are you sure that you want to upload build results to s3?\nIf you really want to (let's say, a jenkins emergency), you must manually set ignoreBuildNumber to false and specify a buildNumber inside the 'bender_fake_jenkins_env_for_testing' options in your gruntfile.\n"
             done()
         else
-            grunt.config.requires 'bender.assetBenderDir',
-                                  'bender.build.projectName'
+            grunt.config.requires 'bender.build.projectName'
 
-            assetBenderPath  = grunt.config.get 'bender.assetBenderDir'
             projectName      = grunt.config.get 'bender.build.projectName'
-            stopwatch        = utils.graphiteStopwatch(grunt)
+            stopwatch        = utils.MetricStopwatch(grunt)
             outputDir        = utils.preferredOutputDir(grunt)
 
             # upload the assets to S3 (too lazy to port at this point)
             grunt.log.writeln "Uploading assets to s3...\n"
 
             pythonBin = process.env.PYTHON_BIN
-            pythonBin = 'python26' unless pythonBin
+            pythonBin = 'python2.6' unless pythonBin
 
-            uploadScript = path.join assetBenderPath, 'script', 'upload_project_assets_to_s3_parallel.py'
+            uploadScript = path.join __dirname, '..', 'lib', 'upload_project_assets_to_s3_parallel.py'
             cmd = "#{pythonBin} #{uploadScript} -p \"#{projectName}\" "
 
             stopwatch.start 'uploading_to_s3'

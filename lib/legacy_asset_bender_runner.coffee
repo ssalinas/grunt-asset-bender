@@ -29,6 +29,7 @@ exports.init = (grunt) ->
 
             @projects = options.project
             @projects = [ @projects ] if @projects? and not Array.isArray @projects
+            @projects = @projects.concat options.extraProjects if options.extraProjects?
 
             @buildVersionMap = options.buildVersions
 
@@ -45,6 +46,11 @@ exports.init = (grunt) ->
             @debug = options.debug
             @limitTo = options.limitTo
             @ignore = options.ignore
+            @production = options.production
+            @nocolor = options.nocolor
+
+            # Default to --nocolor when buffering
+            @nocolor = false if @bufferOutput and not @nocolor?
 
             # other (non-hs-static) options
             @envVars = options.envVars or {}
@@ -106,6 +112,8 @@ exports.init = (grunt) ->
             headlessFlag:            "--headless"
             debugFlag:               "--debug"
             usePrebuiltFlag:         "--use-prebuilt-static-conf"
+            productionFlag:          "--production"
+            nocolorFlag:             "--nocolor"
 
         for own funcName, flag of basicOptionFunctions
             do (funcName, flag) ->

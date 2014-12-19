@@ -64,3 +64,6 @@ module.exports = (grunt) ->
                 grunt.fail.warn "Error copying compiled (non-compressed) output to static-<x.y>-debug/"
             .finally ->
                 done()
+
+        else
+            grunt.fail.warn "Hit unknown case in bender_finalize_debug_assets (debug output folder invalid?)"

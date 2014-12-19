@@ -133,6 +133,23 @@ exports.legacy_asset_bender_options =
         test.deepEqual runner.restrictOption(), ["--restrict", "somevalue"]
         test.done()
 
+    productionFlagNotDefault: (test) ->
+        runner = new LegacyAssetBenderRunner
+            command: 'test'
+
+        test.expect 1
+        test.ok not runner.productionFlag()
+        test.done()
+
+    productionFlag: (test) ->
+        runner = new LegacyAssetBenderRunner
+            command: 'test'
+            production: true
+
+        test.expect 1
+        test.deepEqual runner.productionFlag(), "--production"
+        test.done()
+
     tempDir: (test) ->
         runner = new LegacyAssetBenderRunner
             command: 'test'
