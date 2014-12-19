@@ -34,9 +34,9 @@ module.exports = (grunt) ->
             fixedDepsPath: dependencyTreeOutputPath
             nocolor: grunt.config.get 'bender.build.hideColor'
 
-            # Treat any runtime deps as regular deps, so that they are downloaded
-            # and ready when test code is built and run (it is very likely that
-            # runtime deps are needed for the tests)
+            # Treat any top-level runtime or dev deps as regular deps, so that
+            # they are downloaded and ready when test code is built and run
+            # (it is likely that runtime & dev deps are needed for the tests)
             production: false
 
         stopwatch.start 'download_static_deps'

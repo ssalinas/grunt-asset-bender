@@ -84,12 +84,10 @@ module.exports = (grunt) ->
             # output for later
             bufferOutput: false
 
-        # If this is a project using devDeps/runtimeDeps, don't include them in the debug build.
-        # Also, ignore any jasmine tests and run in separate build step (need to exclude
+        # Ignore any jasmine tests and run in separate build step (need to exclude
         # integrate tests too? but they need to get uploaded...)
         if utils.hasDevOrRuntimeDeps()
-            _.extend debugOptions,
-                production: true
+            # We still want top-level runtime deps, so keeping "production: true"
 
             debugOptions.ignore ?= []
             debugOptions.ignore.push "#{projectName}/static/test/spec*"
