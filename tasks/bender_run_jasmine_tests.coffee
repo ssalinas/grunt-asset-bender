@@ -42,6 +42,7 @@ module.exports = (grunt) ->
                 archiveDir: grunt.config.get 'bender.build.archiveDir'
                 mode: 'precompiled'
                 command: 'jasmine'
+                restrict: grunt.config.get('bender.build.projectName')
                 headless: true
                 buildVersions: buildVersions
                 nocolor: grunt.config.get 'bender.build.hideColor'
