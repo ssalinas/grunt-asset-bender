@@ -146,6 +146,8 @@ module.exports = (grunt) ->
             setRequiredBuildConfig 'bender.build.version', "#{majorVersion}.#{minorVersion}"
             setRequiredBuildConfig 'bender.build.versionWithStaticPrefix', "static-#{majorVersion}.#{minorVersion}"
 
+            utils.writeFile grunt.config.get('bender.build.versionWithStaticPrefix') path.join(grunt.config.get('bender.build.workspace'), '.version')
+
             # Metric client for other tasks to use
             grunt.config.set 'bender.metric.namespace', (process.env.METRIC_KEY_PREFIX or process.env.GRAPHITE_NAMESPACE)
             grunt.config.set 'bender.graphite.server', process.env.GRAPHITE_SERVER
